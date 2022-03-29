@@ -1,6 +1,7 @@
 import logo from '../logo.svg';
 import '../components/modal.css';
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import ListItemsCompnt from '../components/ItemsCpnt';
 import JoinModal from '../components/joinCpnt';
 import ExitCall from '../components/mExitCpnt';
@@ -81,6 +82,10 @@ export class UserOpt extends React.Component {
     window.location.reload();
   }
 
+  tempswich = () => {
+    console.log('wow');
+  }
+
   render(){
     return(
       <div className="App-header">
@@ -89,6 +94,7 @@ export class UserOpt extends React.Component {
         </header>
         <p>PROTO : USER</p>
         UID-{this.state.ptcp}
+        <Link to="/ntcollect"><button>NFT collection</button></Link>
         <p>관여한 문서 {this.state.count}건이 검색됨.</p>
         {this.state.itemList.map(searchItems => (
           <ListItemsCompnt
@@ -121,10 +127,59 @@ export class UserOpt extends React.Component {
         <PurchasePoint
           account={this.state.accounts[0]} contract={this.state.contract}
         />
+        <VendingMachin
+          account={this.state.accounts[0]} contract={this.state.contract}
+        />
       </div>
     )
   }
 }
+class VendingMachin extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      mytoken: 0,
+      account: this.props.account,
+      contract: this.props.contract
+    };
+  }
+  componentDidMount = async() => {
+    const btokn_balance = await this.state.contract.methods.balanceOf(
+      this.state.account).call();
+    this.setState({mytoken: btokn_balance});
+    console.log(btokn_balance);
+  }
+
+  CA_BalButton = async() => {
+    const response = await this.state.contract.methods.ca_ethBal().call();
+    console.log(response);
+  }
+  sellTokn = async() => {
+    const balanceOfCA = await this.state.contract.methods.ca_ethBal().call();
+    const mytoken = this.state.mytoken / 100;
+    const BN = mytoken.toString();
+    //console.log(mytoken, BN);
+    if(balanceOfCA > mytoken){
+      await this.state.contract.methods.sellTokn(BN).send(
+        { from: this.state.account });
+    }
+    else{
+      console.log('no remain eth of ca address');
+    }
+  }
+
+  render(){
+    return(
+      <div>
+        <p>-----Vending Machin-----</p>
+        <button onClick={this.CA_BalButton}>ca-ethBal</button>
+        <button onClick={this.sellTokn}>sell-001</button>
+        <p>B-Tokn: {this.state.mytoken/(10 * 10 ** 17)}</p>
+      </div>
+    )
+  }
+}
+
 class PurchasePoint extends React.Component {
   constructor(props) {
     super(props);
@@ -166,11 +221,6 @@ class PurchasePoint extends React.Component {
   handleOnChange = (evt) => {
     this.setState({amount: evt.target.value});
   }
-  handleTempButton = async() => {
-    //const response = await this.state.contract.methods.userPoint().call();
-    const response = await this.state.contract.methods.tempView().call();
-    console.log(response);
-  }
 
   render(){
     return(
@@ -180,8 +230,7 @@ class PurchasePoint extends React.Component {
               value={this.state.item} onChange={this.handleOnChange}/>
         <button onClick={this.handleFormSubmit} className="btn-trx">
           purchase</button>
-        <button onClick={this.handleTempButton}>log</button>
-        <p>possession: {this.state.mytoken}</p>
+        <p>T-Tokn: {this.state.mytoken}</p>
       </div>
     )
   }

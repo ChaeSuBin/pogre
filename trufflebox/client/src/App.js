@@ -16,6 +16,7 @@ import { UserOpt } from "./pages/myPage";
 import { UploadIead } from "./pages/IdeaUpage";
 import { JoinIead } from "./pages/IdeaJoin";
 import { Nftwave } from "./pages/nftUpage";
+import { Mynft } from "./pages/nftCollection";
 import "./App.css";
 
 class App extends Component {
@@ -95,6 +96,8 @@ class App extends Component {
                   <Route exact path='/myinfo' element={<UserOpt
                     accounts={this.state.accounts} contract={this.state.contract}/>}/>
                   <Route exact path='/ntwave' element={<Nftwave
+                    accounts={this.state.accounts} web3={this.state.web3}/>}/>
+                  <Route exact path='/ntcollect' element={<Mynft
                     accounts={this.state.accounts} web3={this.state.web3}/>}/>
                 </Routes>
               </div>

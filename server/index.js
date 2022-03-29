@@ -165,6 +165,19 @@ app.get("/readimg/:pictitle", async(req, res) => {
     res.json(data) // Send the file data to the browser.
   })
 });
+app.get("/downloadfile/:filename", async(req, res) => {
+  //res.download(`dcuFileSys/${req.params.filename}.docx`);
+  filestream.readFile(
+    `dcuFileSys/${req.params.filename}.docx`, function(err, data) {
+    if (err) throw err
+    const fileName = encodeURIComponent(`${req.params.filename}.docx`);
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'Content-Disposition': `attachment; filename=${fileName}.docx`});
+    res.status(200).send(data);
+  })
+});
 app.put("/nftlimit", async(req, res) => {
   await Piece.findByPk(req.body.pieceId).then(piece => {
     piece.limit -= 1;
@@ -429,7 +442,7 @@ app.post("/ideacreate", async(req, res) => {
     include: Teams,
   });
   uploadocu(req, false);
-  uploadfile(req);
+  //uploadfile(req);
   console.log(result);
 });
 app.post("/regiplayer", async(req, res) => {

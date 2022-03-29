@@ -3,7 +3,7 @@ import {
   getIdeaPlayers, getPlayers, 
   getIdeaPoints, putUpdateTokn, 
   dltTeam, getPlayersId, putFundIdea,
-  putViewIdea  } from "../api.js";
+  putViewIdea, getDcuDown  } from "../api.js";
 import { Link } from "react-router-dom";
 import './modal.css';
 
@@ -106,6 +106,7 @@ class IdeaStatus extends React.Component{
       value: null,
       userInput: 100000,
       showresult: false,
+      allowcheck: false,
       account: this.props.account,
       contract: this.props.contract
     };
@@ -170,7 +171,6 @@ class IdeaStatus extends React.Component{
       userid: _userId
     };
     await putFundIdea(record);
-    console.log('wowwowwo');
   }
 
   updateInput = (_evt) => {
@@ -179,25 +179,13 @@ class IdeaStatus extends React.Component{
   }
 
   docuDown = async() => {
-    const userinfo = await getPlayersId(this.state.account);
+    const result = window.confirm('You agree to keep this document confidential.\r\nYou can be legally responsible for unauthorized distribution.');
+    if(result)
+      this.setState({allowcheck: true});
+    else
+      alert('disapproval');
     
-    if(userinfo.token >= 1){
-      const record = {
-        useraddr: this.state.account,
-        token: 1,
-        mode: 'min'
-      };
-      (async ()=> {
-        await putUpdateTokn(record);
-      })();
-      (async ()=> {
-        await putViewIdea({name: this.props.content.title});
-      })();
-    }
-    else{
-      console.log('not enougth');
-    }
-    console.log('wow');
+    //await getDcuDown(this.props.content.title);
   }
 
   ideaStatus = () => {
@@ -250,6 +238,9 @@ class IdeaStatus extends React.Component{
     return(
       <div>
         <this.ideaStatus></this.ideaStatus>
+        {this.state.allowcheck ? <a id="btn" 
+        href="http://127.0.0.1:3039/downloadfile/demoname">download link</a>
+         : null}
         {/* <button onClick={this.btn_d32}>btn_d32</button> */}
       </div>
     )

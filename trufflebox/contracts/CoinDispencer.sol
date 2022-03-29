@@ -19,12 +19,12 @@ contract CoinDispencer is SeverStore{
             _;
         }
     }
-    
+
     function sellTokn(uint _toknAmount) external{
         require(_toknAmount > 0, "You need to sell at least some tokens");
         allowance(msg.sender, address(this));
         transferFrom(msg.sender, address(this), _toknAmount);
-        payable(msg.sender).transfer(_toknAmount);
+        payable(msg.sender).transfer(_toknAmount*100);
     }
 
     function changePoint(uint8 _requirePoint, uint _calcedPirec) external
@@ -34,7 +34,7 @@ contract CoinDispencer is SeverStore{
         purchase[msg.sender].price = _calcedPirec;
         //trx(purchase[msg.sender].price);
     }
-    function tempView() public view returns(uint){
+    function ca_ethBal() public view returns(uint){
         return address(this).balance;
     }
     function userPoint() public view returns(uint){

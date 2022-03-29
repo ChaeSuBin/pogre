@@ -1,5 +1,6 @@
 async function request(path, options = {}) {
-    const url = `http://localhost:3039${path}`;
+    // const url = `http://localhost:3039${path}`;
+    const url = `http://121.190.220.159:3039${path}`;
     const response = await fetch(url, options);
     return response.json();
 }
@@ -27,6 +28,10 @@ export async function getPicPlayers(_picId) {
 }
 export async function getImgBlob(_picTitle) {
     return request(`/readimg/${_picTitle}`);
+}
+export async function getDcuDown(_docTitle) {
+    console.log(_docTitle);
+    return request(`/downloadfile/${_docTitle}`);
 }
 export async function getIdeaOne(_teamId) {
     return request(`/oneidea/${_teamId}`);

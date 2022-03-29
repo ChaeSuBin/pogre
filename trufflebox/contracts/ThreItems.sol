@@ -9,7 +9,7 @@ contract ThreItems is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    string connecTecs = "farewell";
+    string connecTecs = "farewell.";
 
     constructor(
     ) ERC721("ThreadsNFT", "TReN") {}
@@ -25,6 +25,9 @@ contract ThreItems is ERC721URIStorage {
         _setTokenURI(newItemId, tokenURI);
 
         return newItemId;
+    }
+    function getTotalSupp() public view returns(uint){
+        return _tokenIds.current();
     }
     function connectionTecs() public view returns(string memory){
         return connecTecs;
