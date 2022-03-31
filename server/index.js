@@ -85,6 +85,13 @@ app.get("/oneidea/:teamid", async (req, res) => {
   });
   res.json(idea);
 });
+app.get("/getmynft/:title", async(req, res) => {
+  Piece.findOne({
+    where : {title: req.params.title}
+  }).then(data => {
+    res.json(data);
+  });
+})
 app.get("/teamsview/:nftmode", async (req, res) => {
   const nftmode = req.params.nftmode;
 
@@ -163,6 +170,13 @@ app.get("/readimg/:pictitle", async(req, res) => {
     if (err) throw err // Fail if the file can't be read.
     //res.header(200, {'Content-Type': 'image/jpeg'})
     res.json(data) // Send the file data to the browser.
+  })
+});
+app.get("/viewimg/:pictitle", async(req, res) => {
+  filestream.readFile(`dcuFileSys/${req.params.pictitle}.jpg`, function(err, data) {
+    if (err) throw err // Fail if the file can't be read.
+    res.writeHead(200, {'Content-Type': 'image/jpeg'})
+    res.end(data) // Send the file data to the browser.
   })
 });
 app.get("/downloadfile/:filename", async(req, res) => {

@@ -51,7 +51,9 @@ export class AdminOpt extends React.Component {
       this.state.ptcp,
       _allotStake,
       this.state.price
-    ).send({ from: this.state.accounts[0] });
+    ).send({ 
+      from: this.state.accounts[0],
+      gas: 3000000 });
     this.createRecord();
   }
   createRecord = async() => {

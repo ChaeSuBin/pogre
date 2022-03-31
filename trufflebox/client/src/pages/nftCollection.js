@@ -1,7 +1,7 @@
 import logo from '../logo.svg';
 import '../components/modal.css';
 import React from 'react';
-import { getTeamsCount, getIdeas } from '../api.js';
+import { getOwnNft } from '../api.js';
 import ListItems from '../components/ItemsCpnt';
 import { NtModal } from '../components/ntModal';
 import SimpleStorageContract from "../contracts/ThreItems.json";
@@ -12,7 +12,7 @@ export class Mynft extends React.Component {
     this.state = {
       showModal: false,
       itemList: [],
-      itemsId: [],
+      itemsId: [],//totaltokn
       web3: this.props.web3, 
       accounts: this.props.accounts,
       contract: null
@@ -22,15 +22,14 @@ export class Mynft extends React.Component {
   
   componentDidMount = async () => {
     try {
-        // Get the contract instance.
-        const networkId = await this.state.web3.eth.net.getId();
-        const deployedNetwork = SimpleStorageContract.networks[networkId];
-        const instance = new this.state.web3.eth.Contract(
-          SimpleStorageContract.abi,
-          deployedNetwork && deployedNetwork.address,
-        );
-        
-        this.setState({ contract: instance }, this.runExample);
+      // Get the contract instance.
+      const networkId = await this.state.web3.eth.net.getId();
+      const deployedNetwork = SimpleStorageContract.networks[networkId];
+      const instance = new this.state.web3.eth.Contract(
+        SimpleStorageContract.abi,
+        deployedNetwork && deployedNetwork.address,
+      );
+      this.setState({ contract: instance }, this.runExample);
       } catch (error) {
         // Catch any errors for any of the above operations.
         alert(
@@ -47,37 +46,47 @@ export class Mynft extends React.Component {
     let copyList = [...this.state.itemList];
     let copyItemId = [...this.state.itemsId];
     let toknUri = '';
+    //let iter = 0;
 
     totalTokn = Number(totalTokn);
     balanceOf = Number(balanceOf);
-
-    // let ownerOf = await contract.methods.ownerOf(totalTokn).call();
-    // console.log(totalTokn);
-    // console.log(--totalTokn);
-    // if(ownerOf == accounts[0]){
-    //     console.log('wow');
-    // }
-    while(totalTokn){
-    //while(false){
-        console.log(totalTokn);
+    
+    if(balanceOf == 0)
+      totalTokn = 1;
+    while(totalTokn-1){
+    //while(iter != 5){
+        // console.log(totalTokn);
+        // console.log(balanceOf);
       if(balanceOf){
         let ownerOf = await contract.methods.ownerOf(totalTokn).call();
+        //console.log(ownerOf);
         if(ownerOf != accounts[0]){
           --totalTokn;
         }
         else{
+          --totalTokn;
           --balanceOf;
           toknUri = await contract.methods.tokenURI(totalTokn).call();
           copyList.push(toknUri);
           copyItemId.push(totalTokn);
-          console.log(this.state.itemList);
         }
       }
+      //++iter;
     }
     console.log('prog');
-    this.setState({itemList: copyList});
+    //this.setState({itemList: copyList});
     this.setState({itemsId: copyItemId});
+    this.findNftbyMetadata(copyList);
+    console.log(this.state.itemsId);
   };
+
+  findNftbyMetadata = async(_metadatarr) => {
+    for(let iter = 0; iter < _metadatarr.length; ++iter){
+      _metadatarr[iter] = await getOwnNft(_metadatarr[iter]);
+    }
+    this.setState({itemList: _metadatarr});
+    return 0;
+  }
 
   handleClick = (_searchItems) => {
     //console.log('v ', _searchItems);
@@ -104,13 +113,16 @@ export class Mynft extends React.Component {
               key={searchItems.title}
               title = {searchItems.title}
               description = {searchItems.description}
-              ntmode = {this.state.nftmode}
+              ntmode = {1}
               onClick={() => this.handleClick(searchItems)}
             />
           ))}
           <NtModal
-            account={this.state.accounts[0]} contract={this.state.contract}
-            showFlag={this.state.showModal} content = {this.state.cont}
+            account={this.state.accounts[0]}
+            contract={this.state.contract}
+            showFlag={this.state.showModal}
+            viewMode={true}
+            content = {this.state.cont}
             onClick={()=>{this.modalClose()}} 
           />
         </header>

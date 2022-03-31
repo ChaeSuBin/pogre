@@ -20,11 +20,17 @@ export async function getTeamsCount() {
 export async function getIdeas(_nftmode) {
     return request(`/teamsview/${_nftmode}`);
 }
+export async function getOwnNft(_nftmeta) {
+    return request(`/getmynft/${_nftmeta}`);
+}
 export async function getIdeaPlayers(_ideaId) {
     return request(`/teamsuser/${_ideaId}`);
 }
 export async function getPicPlayers(_picId) {
     return request(`/playpiece/${_picId}`);
+}
+export async function getImgView(_picTitle) {
+    return request(`/viewimg/${_picTitle}`);
 }
 export async function getImgBlob(_picTitle) {
     return request(`/readimg/${_picTitle}`);

@@ -107,6 +107,8 @@ class IdeaStatus extends React.Component{
       userInput: 100000,
       showresult: false,
       allowcheck: false,
+      // downlink: 'http://127.0.0.1:3039/downloadfile/',
+      downlink: 'http://giparang.asuscomm.com:3039/downloadfile/',
       account: this.props.account,
       contract: this.props.contract
     };
@@ -180,8 +182,12 @@ class IdeaStatus extends React.Component{
 
   docuDown = async() => {
     const result = window.confirm('You agree to keep this document confidential.\r\nYou can be legally responsible for unauthorized distribution.');
-    if(result)
+    const link = this.state.downlink + this.props.content.title;
+    console.log(link);
+    if(result){
       this.setState({allowcheck: true});
+      this.setState({downlink: link});
+    }
     else
       alert('disapproval');
     
@@ -239,7 +245,7 @@ class IdeaStatus extends React.Component{
       <div>
         <this.ideaStatus></this.ideaStatus>
         {this.state.allowcheck ? <a id="btn" 
-        href="http://127.0.0.1:3039/downloadfile/demoname">download link</a>
+        href={this.state.downlink}>download link</a>
          : null}
         {/* <button onClick={this.btn_d32}>btn_d32</button> */}
       </div>

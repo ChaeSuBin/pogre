@@ -1,5 +1,10 @@
 import React from 'react';
-import { getPicPlayers, putUpdateTokn, getPlayersId, putNftLimit } from "../api.js";
+import { 
+  getPicPlayers,
+  getImgView, 
+  putUpdateTokn, 
+  getPlayersId, 
+  putNftLimit } from "../api.js";
 import { readImg } from './readImgCpnt.js';
 import './modal.css';
 
@@ -71,6 +76,7 @@ export class NtModal extends React.Component {
             onClick={this.props.onClick}
             contract={this.props.contract}
             account={this.props.account}
+            viewMode={this.props.viewMode}
           />
           </div>
         </div>
@@ -88,6 +94,8 @@ class NFTStatus extends React.Component{
     this.state = {
       value: this.props.content.price,
       showresult: false,
+      viewMode: this.props.viewMode,
+      imgLink: 'http://giparang.asuscomm.com:3039/viewimg/',
       account: this.props.account,
       contract: this.props.contract
     };
@@ -96,12 +104,13 @@ class NFTStatus extends React.Component{
 
   componentDidMount = () => {
     console.log(this.state.value);
+    const viewLink = this.state.imgLink + this.props.content.title;
+    this.setState({imgLink: viewLink});
   }
 
   Purchase = async() => {
     //console.log(this.props.content);
     const userinfo = await getPlayersId(this.state.account);
-    let temp;
     if(userinfo.token >= this.state.value){
       const record = {
         useraddr: this.state.account,
@@ -118,7 +127,6 @@ class NFTStatus extends React.Component{
     else{
       console.log('not enougth');
     }
-    console.log('what');
   }
   innerSync = async(record) => {
     await putUpdateTokn(record);
@@ -128,7 +136,9 @@ class NFTStatus extends React.Component{
     await this.state.contract.methods.mintItem(
       this.state.account,
       this.props.content.title
-    ).send({ from: this.state.account });
+    ).send({ 
+      from: this.state.account,
+      gas: 3000000 });
   }
 
   ideaStatus = () => {
@@ -139,10 +149,26 @@ class NFTStatus extends React.Component{
       <p style={{margin: 0}}>value: {this.state.value}</p>
     </>)
   }
+
+  ResEnd = async() => {
+    window.open(this.state.imgLink);
+    console.log(this.state.imgLink);
+  }
+
+  viewNft = () => {
+    return(<>
+      <button onClick={this.props.onClick}>Close</button>
+      <button onClick={this.ResEnd}>View</button>
+      <p style={{margin: 0, fontSize: "15px"}}>status: view</p>
+      <p style={{margin: 0}}>value: {this.state.value}</p>
+    </>)
+  }
   render(){
     return(
       <div>
-        <this.ideaStatus></this.ideaStatus>
+        {this.state.viewMode ? <this.viewNft>
+        </this.viewNft> : <this.ideaStatus>
+        </this.ideaStatus> }
         {/* <button onClick={this.btn_d32}>btn_d32</button> */}
       </div>
     )
