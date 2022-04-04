@@ -10,6 +10,14 @@ import React, { useState, useEffect } from "react";
 
 export const Home = ({contract, accounts}) => {
   
+  useEffect(()=>{
+    viewTokn20();
+  },[]);
+
+  const viewTokn20 = async() => {
+    const amount = await contract.methods.getTokn20().call();
+    console.log(amount);
+  }
   return (
     <div className="App">
       <header className="App-header">

@@ -152,7 +152,7 @@ class NFTStatus extends React.Component{
 
   ResEnd = async() => {
     window.open(this.state.imgLink);
-    console.log(this.state.imgLink);
+    //console.log(this.state.imgLink);
   }
 
   viewNft = () => {

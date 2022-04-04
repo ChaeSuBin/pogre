@@ -9,7 +9,7 @@ contract ThreItems is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    string connecTecs = "farewell.";
+    string connecTecs = "connection-right_nft";
 
     constructor(
     ) ERC721("ThreadsNFT", "TReN") {}

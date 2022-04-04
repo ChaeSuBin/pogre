@@ -4,7 +4,6 @@ import React from 'react';
 import { getOwnNft } from '../api.js';
 import ListItems from '../components/ItemsCpnt';
 import { NtModal } from '../components/ntModal';
-import SimpleStorageContract from "../contracts/ThreItems.json";
 
 export class Mynft extends React.Component {
   constructor(props) {
@@ -13,32 +12,13 @@ export class Mynft extends React.Component {
       showModal: false,
       itemList: [],
       itemsId: [],//totaltokn
-      web3: this.props.web3, 
       accounts: this.props.accounts,
-      contract: null
+      contract: this.props.contract
     };
     //this.modalClose = this.modalClose.bind(this);
   }
   
   componentDidMount = async () => {
-    try {
-      // Get the contract instance.
-      const networkId = await this.state.web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
-      const instance = new this.state.web3.eth.Contract(
-        SimpleStorageContract.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-      this.setState({ contract: instance }, this.runExample);
-      } catch (error) {
-        // Catch any errors for any of the above operations.
-        alert(
-          `Failed to load web3, accounts, or contract. Check console for details.`,
-        );
-        console.error(error);
-    }
-  }
-  runExample = async () => {
     const { accounts, contract } = this.state;
     //console.log(contract);
     let totalTokn = await contract.methods.getTotalSupp().call();
@@ -50,7 +30,7 @@ export class Mynft extends React.Component {
 
     totalTokn = Number(totalTokn);
     balanceOf = Number(balanceOf);
-    
+
     if(balanceOf == 0)
       totalTokn = 1;
     while(totalTokn-1){
@@ -78,7 +58,7 @@ export class Mynft extends React.Component {
     this.setState({itemsId: copyItemId});
     this.findNftbyMetadata(copyList);
     console.log(this.state.itemsId);
-  };
+  }
 
   findNftbyMetadata = async(_metadatarr) => {
     for(let iter = 0; iter < _metadatarr.length; ++iter){

@@ -9,34 +9,13 @@ export class Nftwave extends React.Component {
     super(props);
     this.state = { 
       checkValue: null,
-      web3: this.props.web3, 
       fileBuffer: [],
       accounts: this.props.accounts, 
-      contract: null
+      contract: this.props.contract
     };
   };
   
   componentDidMount = async () => {
-    try {
-      // Get the contract instance.
-      const networkId = await this.state.web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
-      const instance = new this.state.web3.eth.Contract(
-        SimpleStorageContract.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-      
-      this.setState({ contract: instance }, this.runExample);
-    } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
-      console.error(error);
-    }
-  };
-  
-  runExample = async () => {
     const { accounts, contract } = this.state;
     const response = await contract.methods.connectionTecs().call();
     this.setState({ checkValue: response });
@@ -78,9 +57,6 @@ export class Nftwave extends React.Component {
   }
 
   render() {
-    if (!this.state.web3) {
-      return <div>Loading Web3, accounts, and contract...</div>;
-    }
     return (
       <div className="App-header">
         <header>

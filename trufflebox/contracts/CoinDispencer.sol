@@ -8,7 +8,7 @@ contract CoinDispencer is SeverStore{
         uint price;
         uint8 point;
     }
-    string connecTecs = "farewell";
+    string connecTecs = "connection-right_idea";
     
     mapping(address => userCharge) purchase;
 
