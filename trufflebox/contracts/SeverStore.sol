@@ -5,7 +5,7 @@ import '../client/node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20
 contract SeverStore is ERC20{
 
     constructor() ERC20("Thread", "THRe") {
-        _mint(msg.sender, 10000*10**18);
+        _mint(address(this), 10000*10**18);
     }
     struct playTeam {
         string title;

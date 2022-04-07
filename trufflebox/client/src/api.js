@@ -17,6 +17,9 @@ export async function getHold(_origin) {
 export async function getTeamsCount() {
     return request(`/teamscount`);
 }
+export async function getMintedTokn() {
+    return request(`/allplayerspoint`);
+}
 export async function getIdeas(_nftmode) {
     return request(`/teamsview/${_nftmode}`);
 }

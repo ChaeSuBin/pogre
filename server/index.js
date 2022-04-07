@@ -138,11 +138,19 @@ app.get("/playteams/:playerid", async (req, res) => {
   }
   res.json(items);
 })
-// app.get("/allplayercount", async (req, res) => {
-//   await Players.count().then(rows => {
-//     res.json(rows);
-//   });
-// })
+app.get("/allplayerspoint", async (req, res) => {
+  let pointAmount = 0;
+  let rows = await Players.count();
+  //console.log(countAllPlayers);
+  while(rows > 0){
+    await Players.findByPk(rows).then(user => {
+      pointAmount += user.token;
+    })
+    //console.log(pointAmount);
+    --rows;
+  }
+  res.json(pointAmount);
+});
 app.get("/playerview/:playerid", async (req, res) => {
   const player = await Players.findOne({
     where: { id: req.params.playerid },

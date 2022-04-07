@@ -18,11 +18,13 @@ import { UploadIead } from "./pages/IdeaUpage";
 import { JoinIead } from "./pages/IdeaJoin";
 import { Nftwave } from "./pages/nftUpage";
 import { Mynft } from "./pages/nftCollection";
+import { Faucet } from "./pages/faucet";
 import "./App.css";
 
 class App extends Component {
   state = { 
-    storageValue: 0, 
+    storageEth: 0, 
+    storageTokn20: 0,
     web3: null, 
     accounts: null, 
     contract_idea: null,
@@ -81,9 +83,16 @@ class App extends Component {
     const response = await contract_idea.methods.connection().call();
     const res_nft = await contract_nft.methods.connectionTecs().call();
 
+    const eth_amount = await contract_idea.methods.ca_ethBal().call();
+    const tokn_amount = await contract_idea.methods.totalSupply().call();
+
     // Update state with the result.
+    this.setState({storageEth: eth_amount});
+    this.setState({storageTokn20: tokn_amount});
+    
     console.log(response);
     console.log(res_nft);
+    console.log(this.state.storageEth);
   };
 
   render() {
@@ -105,7 +114,11 @@ class App extends Component {
               <div className="container">
                 <Routes>
                   <Route exact path='/' element={<Home 
-                    accounts={this.state.accounts} contract={this.state.contract_brdg}/> }/>
+                    accounts={this.state.accounts} contract={this.state.contract_brdg}
+                    storedEth={this.state.storageEth}/> }/>
+                  <Route exact path='/faucet' element={<Faucet 
+                    account={this.state.accounts[0]} contract={this.state.contract_idea}
+                    storedEth={this.state.storageEth}/> }/>
                   <Route exact path='/search/:mode' element={<Wrapper/>}/>
                   <Route exact path='/create/:mode' element={<UploadIead 
                     accounts={this.state.accounts} contract={this.state.contract_idea}/>}/>

@@ -8,7 +8,7 @@
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -17,6 +17,20 @@
   color: white;
 }
 
+.App-display {
+  background-color: #282c34;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
 .App-link {
   color: #09d3ac;
+}
+
+.App-exeButton{
+  background-color: #ec3f3f;
+  color: whitesmoke;
 }

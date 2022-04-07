@@ -32,6 +32,9 @@ contract ToknBridge {
     function getTokn20() public view returns(uint256){
         return currencyToken.totalSupply();
     }
+    function getContractTokn20() public view returns(uint256){
+        return currencyToken.balanceOf(address(currencyToken));
+    }
     /**
      * @dev Returns the details for a trade.
      * @param _trade The id for the trade.
