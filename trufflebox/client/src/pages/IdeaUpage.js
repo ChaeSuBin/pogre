@@ -9,24 +9,19 @@ export const UploadIead = ({contract, accounts}) => {
   // }
 
   async function handleFormSubmitUp(record) {
-    //console.log('v: ', record);
-    if(uriParams.mode === 'cycle'){
-      await postCreateIdea(record);
-      console.log('v: ', record);
-    }
-    else{
-      await postCreateIdea(record);
-      console.log('v: ', record);
-    }
+    await postCreateIdea(record);
+    console.log('v: ', record);
   }
   return(
-    <>
+    <div className="App">
       <div className="App-header">
-      <p>PROTO : REGI</p>
-      idea upload
-      <IdeaForm onSubmit={handleFormSubmitUp} useraddr={accounts} rMode={uriParams.mode} />
+        PROTO : REGI
+        <section className="App-display">
+          <p>idea upload</p>
+          <IdeaForm onSubmit={handleFormSubmitUp} useraddr={accounts} rMode={uriParams.mode} />
+        </section>
       </div>
-    </>
+    </div>
   )
 }
 
@@ -89,34 +84,25 @@ function IdeaForm({onSubmit, useraddr, rMode}) {
   
   return(
     <form onSubmit={handleFormSubmit}>
-      <div className="field">
-        <div className="control">
-          addr:
-          <input name="addr" className="input" placeholder='address' size='45'
-          value={address} disabled="disabled"/>
-          <div className="control">
-            select file: <input type='file' onChange={onFileInputChange}/>
-          </div>
-          <label className="label">title</label>
-          <div className="control">
-            <input name="docuname" className="input" />
-          </div>
-          <label className="label">description</label>
-          <div className="control">
-            <textarea name="docudesc" rows='15' cols='45' className="input" />
-          </div>
-          <label className="label">set idea price: </label>
-          <input name="price" type="text" className="input" disabled={blocked}/>
-        </div>
-      </div>
+      addr:
+      <input name="addr" size='44' value={address} disabled="disabled"/>
+      <br/>
+      contact:
+      <input name="contact" placeholder='phone number / e-male / kakao talk ...etc' size='38'/>
+      <br/>
+      select file: <input type='file' onChange={onFileInputChange}/>
+      <br/><br/>
+      title<br/>
+      <input name="docuname" /><br/>
+      description<br/>
+      <textarea name="docudesc" rows='15' cols='45' />
+      <br/><br/>
+      value:
+      <input name="price" type="text" disabled={blocked} placeholder='amount of RED(Token)'/>
       
-      <div className="field">
-        <div className="control">
-          <button type="submit" className="button is-warning">
-            ideaUpload
-          </button>
-        </div>
-      </div>
+      <button type="submit">
+        ideaUpload
+      </button>
     </form>
   )
 }

@@ -1,7 +1,7 @@
 import logo from '../logo.svg';
 import '../components/modal.css';
 import React from 'react';
-import { getTeamsCount, getIdeas } from '../api.js';
+import { getIdeas } from '../api.js';
 import ListItems from '../components/ItemsCpnt';
 import { Modal } from'../components/cModalCpnt';
 import { NtModal } from '../components/ntModal';

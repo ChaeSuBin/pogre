@@ -37,7 +37,7 @@ export class Home extends React.Component{
   }
 
   viewTokn20 = async() => {
-    const tokn_amount = await this.state.contract.methods.getTokn20().call();
+    const tokn_amount = await this.state.contract.methods.getContractTokn20().call();
     this.setState({possesTokn: tokn_amount});
   }
 

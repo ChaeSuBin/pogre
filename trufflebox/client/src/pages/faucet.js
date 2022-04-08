@@ -52,7 +52,7 @@ export class Faucet extends React.Component{
   getContractTokn = async() => {
     const tokn_amount = await this.state.contract.methods.balanceOf('0xB07a335b1e8dd472Cb63FAdF58edAEAeA75E7832').call();
     this.setState({possesTokn: tokn_amount});
-    console.log(tokn_amount);
+    //console.log(tokn_amount);
   }
 
   getAllPoint = async() => {
@@ -160,7 +160,6 @@ class VendingMachin extends React.Component {
           {this.state.discharge} ETH
           <button onClick={this.checkDischarge}>check</button>
           <button className="App-exeButton" onClick={this.sellTokn}>exchange</button>
-          <button onClick={this.tempbutton}>temp-991</button>
         </div>
       )
     }

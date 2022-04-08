@@ -92,7 +92,7 @@ class App extends Component {
     
     console.log(response);
     console.log(res_nft);
-    console.log(this.state.storageEth);
+    //console.log(this.state.storageEth);
   };
 
   render() {
