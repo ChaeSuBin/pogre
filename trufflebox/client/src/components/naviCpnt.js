@@ -59,8 +59,7 @@ function Modal(props){
         <p><li>select your Idea case</li></p>
         <Link to="/ntwave"><button>NFT</button></Link>
         
-        <Link to={'/create/' + 'cycle'}><button>Co-op</button></Link>
-        <Link to={'/create/' + 'rapid'}><button>Direct</button></Link>
+        <Link to={'/create'}><button>Idea</button></Link>
       </section>
       <button onClick={props.onClick}>cancle</button>
     </div>

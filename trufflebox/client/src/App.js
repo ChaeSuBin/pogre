@@ -120,7 +120,7 @@ class App extends Component {
                     account={this.state.accounts[0]} contract={this.state.contract_idea}
                     storedEth={this.state.storageEth}/> }/>
                   <Route exact path='/search/:mode' element={<Wrapper/>}/>
-                  <Route exact path='/create/:mode' element={<UploadIead 
+                  <Route exact path='/create' element={<UploadIead 
                     accounts={this.state.accounts} contract={this.state.contract_idea}/>}/>
                   <Route exact path='/joinup' element={<JoinIead 
                     accounts={this.state.accounts} contract={this.state.contract_idea}/>}/>

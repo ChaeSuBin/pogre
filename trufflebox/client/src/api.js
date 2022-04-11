@@ -11,8 +11,11 @@ export async function getRest(arg = {}) {
 export async function getIdeaPoints(_teamId) {
     return request(`/ideaPoint/${_teamId}`);
 }
-export async function getHold(_origin) {
-    return request(`/alert/${_origin}`);
+export async function getHold(_teamId) {
+    return request(`/alert/${_teamId}`);
+}
+export async function getHoldEmit(_userId) {
+    return request(`/alertemit/${_userId}`);
 }
 export async function getTeamsCount() {
     return request(`/teamscount`);
@@ -66,8 +69,15 @@ export async function putUpdateBlock(record) {
     });
 }
 export async function putExitBlock(record) {
-    console.log('v', JSON.stringify(record));
     return request(`/blockexit`, {
+      body: JSON.stringify(record),
+      headers: {"Content-Type": "application/json"},
+      method: "PUT",
+    });
+}
+export async function putUpdateHold(record) {
+    console.log('v', JSON.stringify(record));
+    return request(`/alertupdate`, {
       body: JSON.stringify(record),
       headers: {"Content-Type": "application/json"},
       method: "PUT",
@@ -146,7 +156,7 @@ export async function postCreateNft(record) {
     });
 }
 export async function postCreateIdea(record) {
-    console.log('v', JSON.stringify(record));
+    //console.log('v', JSON.stringify(record));
     return request(`/ideacreate`, {
       body: JSON.stringify(record),
       headers: {"Content-Type": "application/json"},

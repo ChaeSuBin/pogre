@@ -15,9 +15,9 @@ contract SeverStore is ERC20{
         uint price;
     }
     mapping(uint => playTeam) history;
-    uint countMint = 0;
+    uint countTrading = 0;
 
-    function putBlock(
+    function putBlockAndPurchase(
         uint _team, 
         address[] memory _ptcp, 
         uint[] memory _stake, 
@@ -31,33 +31,24 @@ contract SeverStore is ERC20{
             history[_team].stake.push(_stake[iterA]);
             ++iterA;
         }
-        history[_team].price = _price;
+        history[_team].price = _price * 10**18;
+        transferFrom(msg.sender, address(this), history[_team].price);
+        ideaTrade(_team, _ptcp);
+        history[_team].owner = msg.sender;
     }
-    function minting(uint _team, address[] memory _ptcp)
+    function ideaTrade(uint _team, address[] memory _ptcp)
     internal
     {//_stake = at 0.001
         uint8 iterA = 0;
         while(iterA != _ptcp.length)
         {
-            _mint(_ptcp[iterA], 1*10**15*history[_team].stake[iterA]);
+            transferFrom(
+                address(this),
+                _ptcp[iterA],
+                1*10**15*history[_team].stake[iterA]);
             ++iterA;
-            //countMint += 1*10**15*history[_team].stake[iterA];
         }
-    }
-    function retrieve(uint _value, address _editor)
-    external
-    {
-        _mint(_editor, 1*10**15*_value);
-        countMint += 1*10**15*_value;
-    }
-    function purchase(
-        uint _team, 
-        address _buyer, 
-        address[] memory _ptcp)
-    external
-    {
-        history[_team].owner = _buyer;
-        minting(_team, _ptcp);
+        ++countTrading;
     }
     function getPtcp(uint _team) public view returns(address[] memory){
         return history[_team].name;
@@ -70,6 +61,9 @@ contract SeverStore is ERC20{
     }
     function getPrice(uint _team) public view returns(uint){
         return history[_team].price;
+    }
+    function getTradingCounter() public view returns(uint){
+        return countTrading;
     }
 }
 

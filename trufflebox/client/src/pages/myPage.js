@@ -3,11 +3,11 @@ import '../components/modal.css';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ListItemsCompnt from '../components/ItemsCpnt';
-import JoinModal from '../components/joinCpnt';
+import { JoinModal } from '../components/joinCpnt';
 import ExitCall from '../components/mExitCpnt';
 import { registChecker } from '../components/registCatch';
 import { getTeams, getIdeaOne, getHold, putUpdateTokn,
-  getPlayersId , getPlayers
+  getPlayersId , getPlayers, getHoldEmit
 } from '../api.js';
 
 export class UserOpt extends React.Component {
@@ -17,6 +17,7 @@ export class UserOpt extends React.Component {
     this.state = {
       showModal: false,
       showModal2: false,
+      holdTitle: [],
       itemList: [],
       alertList: [],
       count: null,
@@ -43,24 +44,47 @@ export class UserOpt extends React.Component {
         this.putItemList(iter, copyList, copyAlert, data);
       }
     });
-    //console.log.dig
   }
 
-  putItemList = async(_iterNum, _copyList, _copyAlert,_teamId) => {
+  putHoldList = async() => {
+    let copyAlert = [...this.state.alertList];
+    await getHoldEmit(this.state.ptcp).then((data) => {
+      const length = data.length;
+      for(let iter = 0; iter < length; ++iter){
+        copyAlert.push(data[iter]);
+      }
+      this.setState({alertList: copyAlert});
+    })
+  }
+
+  putItemList = async(_iterNum, _copyList, _copyAlert, _teamId) => {
     await getIdeaOne(_teamId[_iterNum]).then((data) => {
       _copyList.push(data);
+      this.setState({itemList: _copyList});
     });
-    this.setState({itemList: _copyList});
-    //console.log(this.state.itemList);
-    if(this.state.itemList[_iterNum] == null){
-      console.log('not');
-    }
-    else{
-      await getHold(this.state.itemList[_iterNum].title).then((data) => {
-        _copyAlert.push(data);
+    
+    if(this.state.itemList[_iterNum] !== null){
+      console.log(this.state.itemList[_iterNum]);
+      await getHold(this.state.itemList[_iterNum].id).then((data) => {
+        const length = data.length;
+        
+        for(let iter = 0; iter < length; ++iter){
+          console.log(data[iter].userId);
+          if(data[iter].userId !== this.state.ptcp && data[iter].status === 0){
+            _copyAlert.push(data[iter]);
+          }
+          else{
+            console.log('no alert');
+          }
+          this.setState({alertList: _copyAlert});
+          //this.forceUpdate();
+
+          //console.log(data[iter]);
+          //_copyAlert.push(data[iter]);
+        }
       });
-      this.setState({alertList: _copyAlert});
-      console.log(this.state.alertList);
+      // this.setState({alertList: _copyAlert});
+      //console.log(this.state.alertList);
     }
   }
 
@@ -82,8 +106,10 @@ export class UserOpt extends React.Component {
     window.location.reload();
   }
 
-  tempswich = () => {
-    console.log('wow');
+  getTitle = async(_teamId) => {
+    const title = await getIdeaOne(_teamId).title;
+    console.log(title);
+    return title;
   }
 
   render(){
@@ -95,32 +121,35 @@ export class UserOpt extends React.Component {
         <p>PROTO : USER</p>
         UID-{this.state.ptcp}
         <Link to="/ntcollect"><button>NFT collection</button></Link>
-        <p>관여한 문서 {this.state.count}건이 검색됨.</p>
+        <p>관여한 문서 {this.state.count}건.</p>
         {this.state.itemList.map(searchItems => (
           <ListItemsCompnt
-            key={searchItems.title}
+            key={searchItems.id}
             title = {searchItems.title}
             description = {searchItems.description}
             onClick={() => this.handleClick(searchItems)}
           />
         ))}
         <ExitCall
-            account={'this.state.accounts'} showFlag={this.state.showModal2}
+            showFlag={this.state.showModal2}
             content = {this.state.cont}
             onClick={()=>{this.modalClose()}}
           />
-        <p>참가 요청 {this.state.alertList.length}건이 검색됨.</p>
+        <p>알림 {this.state.alertList.length}건.</p>
         {this.state.alertList.map(searchItems => (
           <ListItemsCompnt
-            key={searchItems.title}
-            title = {searchItems.title}
-            description = {searchItems.description}
+            key={searchItems.id}
+            title = {this.state.holdTitle[searchItems.id]}
+            description = {'click to confirm'}
             onClick={() => this.handleClick(searchItems)}
           />
         ))}
+        <button onClick={this.putHoldList}>alert</button>
         { this.state.alertList.length ? <JoinModal
-          account={'this.state.accounts'} showFlag={this.state.showModal}
+          showFlag={this.state.showModal}
           content = {this.state.cont}
+          account = {this.state.accounts[0]}
+          contract = {this.state.contract}
           onClick={()=>{this.modalClose()}}
         />: <></> }
       </div>

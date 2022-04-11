@@ -40,9 +40,6 @@ contract CoinDispencer is SeverStore{
     function ca_ethBal() public view returns(uint){
         return address(this).balance;
     }
-    function userPoint() public view returns(uint){
-        return purchase[msg.sender].point;
-    }
     function connection() public view returns(string memory){
         return connecTecs;
     }

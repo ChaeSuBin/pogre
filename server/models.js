@@ -40,21 +40,18 @@ export const Teams = sequelize.define(
       allowNull: false,
     },
     ideaToken: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
       allowNull: true,
+    },
+    type: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     blocked: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
-    cycle: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-    display: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
+    
   },
   { underscored: true },
 );
@@ -74,19 +71,27 @@ export const PlayersPiece = sequelize.define(
 
 export const Holds = sequelize.define("holds",
   {
-    title: {
-      type: DataTypes.STRING,
+    teamId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     description: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+    },
+    tokn: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
     },
     reqstake: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
     },
     userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    status: {
       type: DataTypes.INTEGER,
       allowNull: false,
     }

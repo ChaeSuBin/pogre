@@ -35,10 +35,26 @@ app.get("/ideaPoint/:teamid", async(req, res) => {
   }
   res.json(ideaPoint);
 });
-app.get("/alert/:title", async(req, res) => {
-  const hold = await Holds.findOne({
-    where: { title: req.params.title },
+app.get("/alert/:teamid", async(req, res) => {
+  const hold = await Holds.findAll({
+    where: { teamId: req.params.teamid },
   });
+  if(hold == null){
+      console.log('not found..');
+  }
+  else{
+    res.json(hold);
+  }
+});
+app.get("/alertemit/:userid", async(req, res) => {
+  const hold = await Holds.findAll({
+    where: { 
+      [sequelize.Op.and]: {
+        userId: req.params.userid,
+        status: {[sequelize.Op.ne]: 0}
+      }
+    }
+  })
   if(hold == null){
       console.log('not found..');
   }
@@ -100,7 +116,6 @@ app.get("/teamsview/:nftmode", async (req, res) => {
   if(nftmode === 'idea'){
     const ideas = await Teams.findAndCountAll({
       order: [[sequelize.literal("id"), "DESC"]],
-      where: {display: true},
       limit,
       offset,
     });
@@ -212,7 +227,7 @@ app.put("/blockset", async(req, res) => {
     team.blocked = req.body.blocked;
     team.display = req.body.display;
     team.save();
-    console.log('blockset');
+    console.log(10001);
   })
 });
 app.put("/blockexit", async(req, res) => {
@@ -221,6 +236,13 @@ app.put("/blockexit", async(req, res) => {
     team.ideaToken = req.body.price;
     team.save();
     console.log('o---------blcoexit');
+  })
+});
+app.put("/alertupdate", async(req, res) => {
+  await Holds.findByPk(req.body.holdId).then(hold => {
+    hold.status = req.body.status;
+    hold.save();
+    console.log(10002);
   })
 });
 app.put("/tokenudt", async(req, res) => {
@@ -286,17 +308,29 @@ app.put("/fundidea", async(req, res) => {
 });
 app.put("/joinidea", async(req, res) => {
   const team = await Teams.findOne({
-    where: { title: req.body.name },
+    where: { id: req.body.teamid },
   });
+  console.log(10001);
   const player = await Players.findOne({
     where: { id: req.body.userid }
   });
-  
-  await player.addTeams(team, { through: { status: req.body.stake }});
-  if(team != null){
-    team.description = req.body.desc;
-    await team.save();
+  console.log(10002);
+
+  const teamPlayer = await TeamPlayers.findOne({
+    where: { teamId: req.body.teamid}
+  })
+  if(teamPlayer != null){
+    console.log(10003);
+    console.log(teamPlayer.status);
+    teamPlayer.status -= req.body.stake;
+    await teamPlayer.save();
   }
+  // await TeamPlayers.findOne({
+  //   where: { teamId: req.body.teamid}}).then(owner => {
+  //     owner.status -= req.body.stake;
+  //     save
+  //   })
+  await player.addTeams(team, { through: { status: req.body.stake }});
 });
 // app.post("/uploadfile", async(req, res) => {
 //   const idxContents = `{"title":"${req.body.name}","description":"${req.body.desc}"}`;
@@ -362,35 +396,25 @@ const uploadocu = async(_req, nftmode) => {
   }
 }
 app.post("/requirejoin", async(req, res) => {
-  const reqTeam = {
-  title : req.body.name,
-  description : req.body.desc,
-  reqstake: req.body.putstake,
-  userId : req.body.userid,
+  const rows = await Holds.count() + 1;
+  console.log(rows);
+  const record = {
+      teamId: req.body.teamid,
+      description : req.body.desc,
+      tokn: req.body.tokn,
+      reqstake: req.body.putstake,
+      userId : req.body.userid,
+      status: 0
   }
-  console.log('test: ====================', reqTeam);
-  await Players.findOrCreate({
-    where: { sub: req.body.useraddr },
-    defaults: {
-      nickname: 'auto-gen',
-      token: 0,
-    },
-  }).then(([player, created]) => {
+  console.log(record);
+  await Holds.findOrCreate({
+    where: { id: rows },
+    defaults: record
+  }).then(([hold, created]) => {
     if(created){
-      console.log('o--------------create');
-      player.save();
-    }
-    else{
-      console.log('x==============create');
+      console.log(10001);
     }
   });
-  const [team, created] = await Holds.findOrCreate({
-      where: { title: req.body.name },
-      defaults: reqTeam,
-  });
-  if (created) {
-      console.log('o---------crted');
-  }
 });
 app.post("/nftcreate", async(req, res) => {
   console.log('n---------------', req.body);
@@ -435,8 +459,7 @@ app.post("/ideacreate", async(req, res) => {
       title: req.body.name,
       description: req.body.desc,
       ideaToken: req.body.price,
-      cycle: req.body.cycle,
-      display: req.body.display,
+      type: req.body.mode,
       blocked: false,
     },
   });

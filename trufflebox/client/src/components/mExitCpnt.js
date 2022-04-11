@@ -97,7 +97,6 @@ class ExitCall extends React.Component {
                   </li>
                 ))}
               </ul>
-              <button onClick={this.BlockIdea}>Block</button>
               { this.state.showResult ? <input name="price" className="input" 
                 onChange={this.updateInput}/> : null }
               <button onClick={this.props.onClick}>Close</button>
