@@ -7,11 +7,11 @@ import { registChecker } from "../components/registCatch.js";
 export const JoinIead = ({contract, accounts}) => {
   const location = useLocation(); // URL path や パラメータなど。JSのlocationと同じ
   console.log(location);
-  const [partName, setName] = useState(queryString.parse(location.search));
+  const [partName] = useState(queryString.parse(location.search));
   const docuName = partName.title;
   const hashCode = useState(queryString.parse(location.hash));
   const docuOrigin = hashCode[0].origin;
-  //console.log('o: ', docuOrigin);
+  console.log('o: ', docuOrigin);
   
   async function handleFormSubmitUp(record) {
     await postHoldIdea(record);
@@ -50,7 +50,7 @@ function IdeaForm({onSubmit, docuName, docuOri, useraddr}) {
   async function handleFormSubmit(evt) {
     evt.preventDefault();
     const record = {
-      name: evt.target.elements.docuname.value,
+      teamid: docuOri,
       desc: evt.target.elements.docudesc.value,
       useraddr: evt.target.elements.addr.value,
       putstake: evt.target.elements.stake.value,

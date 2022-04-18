@@ -51,6 +51,11 @@ export const Teams = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
+    file: {
+      type: DataTypes.BOOLEAN,
+      default: false,
+      allowNull: false,
+    },
     
   },
   { underscored: true },
@@ -85,7 +90,7 @@ export const Holds = sequelize.define("holds",
     },
     reqstake: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     userId: {
       type: DataTypes.INTEGER,

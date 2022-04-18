@@ -1,5 +1,6 @@
 import express from "express";
-import sequelize from "sequelize";
+//import sequelize from "sequelize";
+import { sequelize } from "./models.js";
 import filestream from "fs";
 import sharp from "sharp";
 import cors from "cors";
@@ -47,16 +48,12 @@ app.get("/alert/:teamid", async(req, res) => {
   }
 });
 app.get("/alertemit/:userid", async(req, res) => {
-  const hold = await Holds.findAll({
-    where: { 
-      [sequelize.Op.and]: {
-        userId: req.params.userid,
-        status: {[sequelize.Op.ne]: 0}
-      }
-    }
-  })
-  if(hold == null){
-      console.log('not found..');
+  console.log(30000, req.params.userid)
+  const [hold, meta] = await sequelize.query(`select id, reqstake, description, status, user_id, team_id, tokn from holds where user_id=${req.params.userid} and status=1 or status=2 or status=4`);
+  console.log(hold);
+  console.log(meta.rowCount);
+  if(meta.rowCount == 0){
+    res.json('not found');
   }
   else{
     res.json(hold);
@@ -232,10 +229,16 @@ app.put("/blockset", async(req, res) => {
 });
 app.put("/blockexit", async(req, res) => {
   await Teams.findByPk(req.body.teamId).then(team => {
-    team.blocked = req.body.blocked;
+    team.blocked = req.body.block;
+    team.save();
+    console.log(80001);
+  })
+});
+app.put("/priceupdate", async(req, res) => {
+  await Teams.findByPk(req.body.teamId).then(team => {
     team.ideaToken = req.body.price;
     team.save();
-    console.log('o---------blcoexit');
+    console.log(12000);
   })
 });
 app.put("/alertupdate", async(req, res) => {
@@ -272,6 +275,7 @@ app.put("/viewidea", async(req, res) => {
   }
 })
 app.put("/fundidea", async(req, res) => {
+  console.log(10000);
   const team = await Teams.findOne({
     where: { title: req.body.name },
   });
@@ -396,15 +400,20 @@ const uploadocu = async(_req, nftmode) => {
   }
 }
 app.post("/requirejoin", async(req, res) => {
+  let status = 0;
   const rows = await Holds.count() + 1;
   console.log(rows);
+  if(req.body.purchase)
+    status = 3;
+  console.log(req.body.purchase);
+  console.log(status);
   const record = {
       teamId: req.body.teamid,
       description : req.body.desc,
       tokn: req.body.tokn,
       reqstake: req.body.putstake,
       userId : req.body.userid,
-      status: 0
+      status: status
   }
   console.log(record);
   await Holds.findOrCreate({
@@ -451,7 +460,7 @@ app.post("/nftcreate", async(req, res) => {
   });
 });
 app.post("/ideacreate", async(req, res) => {
-  console.log('k---------------', req.body.price);
+  console.log(40000, req.body.price);
   
   const [team, created] = await Teams.findOrCreate({
     where: { title: req.body.name },
@@ -460,6 +469,7 @@ app.post("/ideacreate", async(req, res) => {
       description: req.body.desc,
       ideaToken: req.body.price,
       type: req.body.mode,
+      file: false,
       blocked: false,
     },
   });
@@ -486,7 +496,11 @@ app.post("/ideacreate", async(req, res) => {
     where: { sub: req.body.useraddr },
     include: Teams,
   });
-  uploadocu(req, false);
+  if(req.body.fbolb !== null){
+    sequelize.query(`update teams set file=true where id=${team.id}`);
+    console.log(4000);
+    uploadocu(req, false);
+  }
   //uploadfile(req);
   console.log(result);
 });

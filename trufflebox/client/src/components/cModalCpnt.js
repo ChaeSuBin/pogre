@@ -3,7 +3,7 @@ import {
   getIdeaPlayers, getPlayers, 
   getIdeaPoints, putUpdateTokn, 
   dltTeam, getPlayersId, putFundIdea,
-  getTeamPlayers, postHoldIdea, putViewIdea, getDcuDown  } from "../api.js";
+  getTeamPlayers, postHoldIdea, putViewIdea, getDcuDown, getIdeaOne, putExitBlock  } from "../api.js";
 import { Link } from "react-router-dom";
 import './modal.css';
 
@@ -133,14 +133,16 @@ export class Modal extends React.Component {
     );
   }
 }
-const getTeamAddr = async(_teamId, _ptcp, _account, _contract) => {
+export const getTeamAddr = async(_teamId, _account, _contract) => {
   const history = await getTeamPlayers(_teamId);
   let StakeArr = [];
+  let Ptcps = [];
   const ptcpLen = history.length;
   const price = history[0];
   let iter = 1;
   
   while(iter != ptcpLen){
+    Ptcps.push(history[iter]);;
     StakeArr.push(history[iter+1]);
     iter += 2;
   }
@@ -149,15 +151,19 @@ const getTeamAddr = async(_teamId, _ptcp, _account, _contract) => {
   const allotArr = allotVar(StakeArr, price);
   console.log('v: ', allotArr);
 
+  (async ()=> {
+    await putExitBlock({teamId: _teamId, block: true});
+  })();
+  console.log(price);
+
   await _contract.methods.putBlockAndPurchase(
     _teamId,
-    _ptcp,
+    Ptcps,
     allotArr,
     price
     ).send({ 
       from: _account,
-      gas: 3000000 
-  });
+  }).on('error', function(error){putExitBlock({teamId: _teamId, block: false});})
 }
 const allotVar = (_stake, _price) => {
   const stakeLen = _stake.length;
@@ -214,17 +220,23 @@ class Type_direct extends React.Component{
     }
   }
   
-  docuDown = () => {
-    const result = docuLink(this.state.content.title);
-    this.setState({allowcheck: result[0]});
-    this.setState({downlink: result[1]});
+  docuDown = async() => {
+    const fileCheck = await getIdeaOne(this.state.content.id);
+    console.log(fileCheck.file);
+    if(fileCheck.file){
+      const result = docuLink(this.state.content.title);
+      this.setState({allowcheck: result[0]});
+      this.setState({downlink: result[1]});
+    } 
+    else
+      alert('not exist this document file');
     //await getDcuDown(this.props.content.title);
   }
 
   purchase = async() => {
     getTeamAddr(
       this.state.content.id,
-      this.state.editors,
+      //this.state.editors,
       this.state.account,
       this.state.contract
     );
@@ -250,8 +262,8 @@ const informFunding = async(_record, _account, _contract) => {
   //hold테이블 이용하여 참여알림 설정할 것
   const toknBalance = await _contract.methods.balanceOf(
     _account).call();
-  console.log(toknBalance);
-  if(toknBalance > _record.desc * 10**18){
+  console.log(_record);
+  if(toknBalance > _record.tokn * 10**18){
     await postHoldIdea(_record);
   }
   else{
@@ -265,7 +277,9 @@ class Type_cycle extends React.Component{
     this.state = {
       inputTokn: null,
       inputStake: null,
+      inputPurchase: null,
       showFlag: false,
+      showPurchase: false,
       content: this.props.content,
       account: this.props.account,
       contract: this.props.contract
@@ -275,43 +289,62 @@ class Type_cycle extends React.Component{
   tempButton = () => {
     tempButtonf(this.state.content, this.state.account);
   }
+  updateInput_A = (_evt) => {
+    console.log(_evt.target.value,);
+    this.setState({inputTokn: _evt.target.value,});
+  }
+  updateInput_B = (_evt) => {
+    console.log(_evt.target.value,);
+    this.setState({inputStake: _evt.target.value,});
+  }
 
-  fundingBtn = async() => {
+  fundOrPurcBtn = async(_purchase) => {
     const UID = await getPlayersId(this.state.account);
     const record = {
       teamid : this.state.content.id,
       desc: null,
       tokn: this.state.inputTokn,
       putstake: this.state.inputStake,
-      userid: UID.id
+      userid: UID.id,
+      purchase: _purchase
     }
     informFunding(record, this.state.account, this.state.contract);
-  }
-  updateInput_A = (_evt) => {
-    console.log(_evt.target.value,)
-    this.setState({inputTokn: _evt.target.value,});
-  }
-  updateInput_B = (_evt) => {
-    console.log(_evt.target.value,)
-    this.setState({inputStake: _evt.target.value,});
   }
 
   render(){
     return(
       <>
         <button onClick={this.props.onClick}>Close</button>
-        <button onClick={() => this.setState({showFlag: true})}>funding</button>
-        {this.state.showFlag ? ( // showFlagがtrueだったらModalを表示する
+        <button onClick={() => this.setState({showPurchase: true})}>Purchase</button>
+        {this.state.showPurchase ? ( // showFlagがtrueだったらModalを表示する
         <>
           <br/>
-          <input name="tokn" className="input" 
+          <input name="price" className="input" 
             placeholder='amound of tokn' onChange={this.updateInput_A}/><br/>
-          <input name="stak" className="input" 
-           placeholder='stake to be request' onChange={this.updateInput_B}/><br/>
-          <button onClick={this.fundingBtn}>fund</button>
+          <button onClick={() => this.fundOrPurcBtn(true)}>send</button>
         </>
         ) : (
-          <></>// showFlagがfalseの場合はModalは表示しない)
+          <><Link to={{
+            pathname: '/joinup',
+            search: `title=${this.props.content.title}`,
+            hash: `origin=${this.state.content.id}`,
+            state: {key: 'valuee'}
+          }}>
+          <button onClick={this.joinIdea}>Join</button>
+          </Link>
+          <button onClick={() => this.setState({showFlag: true})}>funding</button>
+          {this.state.showFlag ? ( // showFlagがtrueだったらModalを表示する
+          <>
+            <br/>
+            <input name="tokn" className="input" 
+              placeholder='amound of tokn' onChange={this.updateInput_A}/><br/>
+            <input name="stak" className="input" 
+             placeholder='stake to be request' onChange={this.updateInput_B}/><br/>
+            <button onClick={() => this.fundOrPurcBtn(false)}>fund</button>
+          </>
+          ) : (
+            <></>// showFlagがfalseの場合はModalは表示しない)
+          )}</>// showFlagがfalseの場合はModalは表示しない)
         )}
       </>
     )

@@ -17,8 +17,8 @@ class ExitCall extends React.Component {
   }
   
   componentDidUpdate = (prevProps) => {
-    //console.log(this.props);
     if (this.props.content !== prevProps.content){
+      //console.log(this.props.content);
       this.getPlayer();
     }
     else{
@@ -26,14 +26,20 @@ class ExitCall extends React.Component {
     }
     //this.getPlayer();
   }
+  // componentDidMount = () => {
+  //   this.getPlayer();
+  // }
   
   getPlayer = async() => {
-    if(this.props.content == null){
+    if(this.props.content === null){
       console.log('-');
     }
     else{
       //console.log(props.content.origin);
       let ideaid = this.props.content.id;
+      if(ideaid === undefined){
+        ideaid = this.props.content.team_id;
+      }
       await getIdeaPoints(ideaid).then((data) => {
         let copyPoint = [...this.state.points];
         let tempScore = 0;

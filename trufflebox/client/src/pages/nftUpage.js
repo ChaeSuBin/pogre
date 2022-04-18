@@ -82,7 +82,7 @@ export class Nftwave extends React.Component {
           <input name="price" type="text" className="input"/><p>
           <label className="label">set limit: </label>
           <input name="limit" type="text" className="input"/></p>
-          <button type="submit" className="button is-warning">
+          <button type="submit" className="App-exeButton2">
             Mint
           </button>
         </form>

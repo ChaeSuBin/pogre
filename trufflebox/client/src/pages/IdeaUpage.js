@@ -33,6 +33,7 @@ export class UploadIead extends React.Component {
       };
     await postCreateIdea(record);
     console.log('v: ', record);
+    alert('submitted');
   }
     
   onFileInputChange = (e) => {
@@ -57,23 +58,23 @@ export class UploadIead extends React.Component {
   inputForm = () => {
     return(<>
       <form onSubmit={this.handleFormSubmit}>
-        addr:
+        {/* addr:
         <input name="addr" size='44' value={this.state.accounts} disabled="disabled"/>
-        <br/>
-        contact:
+        <br/> */}
+        연락처:
         <input name="contact" placeholder='phone number / e-male / kakao talk ...etc' size='38'/>
         <br/>
-        select file: <input type='file' onChange={this.onFileInputChange}/>
+        <input type='file' onChange={this.onFileInputChange}/>
         <br/><br/>
         title<br/>
-        <input name="docuname" /><br/>
+        <input name="docuname" size='38'/><br/>
         description<br/>
         <textarea name="docudesc" rows='15' cols='45' />
-        <br/><br/>
+        <br/>
         value:
         <input name="price" type="text" disabled={!this.state.uploadMode} placeholder='amount of RED(Token)'/>
-      
-        <button type="submit">
+        <br/><br/>
+        <button className="App-exeButton2" type="submit">
         ideaUpload
         </button>
       </form>
@@ -99,14 +100,16 @@ export class UploadIead extends React.Component {
     return(
       <div className="App">
         <div className="App-header">
-          PROTO : REGI
           <section className="App-display">
-            <p>idea upload</p>
-            <label><input type="radio" name="color1" value="dirc" onChange={this.checkRadio}/> 거래형-일반</label>
-            <label><input type="radio" name="color1" value="cycl" onChange={this.checkRadio}/> 거래형-개선</label>
-            <label><input type="radio" name="color1" value="fund" onChange={this.checkRadio}/> 펀딩형</label>
+            
+            
+            {this.state.modeCheck ? <this.inputForm></this.inputForm> : <>
+            <p>아이디어를 업로드 후 어떻게 하시겠습니까?</p>
             <br/>
-            {this.state.modeCheck ? <this.inputForm></this.inputForm> : <>select one</>}
+            <label><input type="radio" name="color1" value="dirc" onChange={this.checkRadio}/> 그대로 팔기</label>
+            <label><input type="radio" name="color1" value="cycl" onChange={this.checkRadio}/> 다른 사람들과 협업하여 개선 후 팔기</label>
+            {/* <label><input type="radio" name="color1" value="fund" onChange={this.checkRadio}/> fund</label> */}
+            ...</>}
           </section>
         </div>
       </div>

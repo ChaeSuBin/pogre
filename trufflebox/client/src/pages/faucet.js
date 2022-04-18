@@ -87,6 +87,7 @@ export class Faucet extends React.Component{
           <button onClick={this.faucet}>faucet</button><br/>
           <PurchasePoint 
             account={this.state.account} contract={this.state.contract}
+            myBlue={this.state.myPoint}
           /> <br/>
           <VendingMachin
             account={this.state.account} contract={this.state.contract}
@@ -147,19 +148,21 @@ class VendingMachin extends React.Component {
         //console.log(this.state.discharge);
     }
 
-    tempbutton = () => {
-        console.log(this.state.storedEth);
+    tempbutton = async() => {
+      const wow = await this.state.contract.methods.getOwner(5).call();
+        console.log(wow);
     }
   
     render(){
       return(
         <div>
-          ----------Sell RED <br/>
-          <input name="name" className="input" placeholder='amount RED will be sell' 
+          ----------Sale RED <br/>
+          <input name="name" className="input" placeholder='amount RED will be sale' 
             onChange={this.inputRED}/> <br/>
           {this.state.discharge} ETH
           <button onClick={this.checkDischarge}>check</button>
           <button className="App-exeButton" onClick={this.sellTokn}>exchange</button>
+          {/* <button onClick={this.tempbutton}>temp</button> */}
         </div>
       )
     }
@@ -170,16 +173,13 @@ class PurchasePoint extends React.Component {
       super(props);
       this.state = {
         buttonMode: true,
-        myBlue: 0,
+        myBlue: this.props.myBlue,
         willUseBlue: 0,
         amount: 0, //will purchase RED amount
         discharge: 0,
         account: this.props.account,
         contract: this.props.contract
       };
-    }
-  
-    componentDidMount = async() => {
     }
   
     createRecord = async() => {
@@ -191,30 +191,35 @@ class PurchasePoint extends React.Component {
       await putUpdateTokn(record);
     }
     handleFormSubmit = async(evt) => {
-      if(this.state.buttonMode){
-        const price = this.state.discharge * 10**18;
-        const BN = price.toString();
-        const requiredRed = this.state.amount * 10000;
-        alert('was submitted: ' + price);
-        await this.state.contract.methods.changePoint(requiredRed, BN).send(
-            { from: this.state.account,
-            gas: 3000000,
-            value: price
-            });
-        evt.preventDefault();
+      if(this.props.myBlue >= this.state.willUseBlue){
         this.createRecord();
+        if(this.state.buttonMode){
+          const price = this.state.discharge * 10**18;
+          const BN = price.toString();
+          const requiredRed = this.state.amount * 10000;
+          alert('was submitted: ' + price);
+          await this.state.contract.methods.changePoint(requiredRed, BN).send(
+              { from: this.state.account,
+              gas: 3000000,
+              value: price
+              });
+          //evt.preventDefault();
+          //this.createRecord();
+        }
+        else{
+          const requiredRed = this.state.discharge * 10000;
+          await this.state.contract.methods.changePoint(requiredRed, 0).send(
+            { from: this.state.account,
+              gas: 3000000,
+              value: 0
+            });
+          // evt.preventDefault();
+          // this.createRecord();
+        }
       }
       else{
-        const requiredRed = this.state.discharge * 10000;
-        await this.state.contract.methods.changePoint(requiredRed, 0).send(
-          { from: this.state.account,
-            gas: 3000000,
-            value: 0
-          });
-        evt.preventDefault();
-        this.createRecord();
+        alert('not enough your Blue')
       }
-      
     }
 
     inputRED = (evt) => {
@@ -242,6 +247,7 @@ class PurchasePoint extends React.Component {
         this.setState({buttonMode: true})
         this.setState({discharge: price});
       }
+      console.log(this.props.myBlue);
     }
   
     render(){

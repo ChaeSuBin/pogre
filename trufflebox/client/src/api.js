@@ -75,6 +75,14 @@ export async function putExitBlock(record) {
       method: "PUT",
     });
 }
+export async function putPrice(record) {
+    console.log('v', JSON.stringify(record));
+    return request(`/priceupdate`, {
+      body: JSON.stringify(record),
+      headers: {"Content-Type": "application/json"},
+      method: "PUT",
+    });
+}
 export async function putUpdateHold(record) {
     console.log('v', JSON.stringify(record));
     return request(`/alertupdate`, {

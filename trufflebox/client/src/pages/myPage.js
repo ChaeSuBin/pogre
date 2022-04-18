@@ -48,12 +48,16 @@ export class UserOpt extends React.Component {
 
   putHoldList = async() => {
     let copyAlert = [...this.state.alertList];
+    console.log(this.state.ptcp);
     await getHoldEmit(this.state.ptcp).then((data) => {
-      const length = data.length;
-      for(let iter = 0; iter < length; ++iter){
-        copyAlert.push(data[iter]);
+      console.log(data);
+      if(data !== 'not found'){
+        const length = data.length;
+        for(let iter = 0; iter < length; ++iter){
+          copyAlert.push(data[iter]);
+        }
+        this.setState({alertList: copyAlert});
       }
-      this.setState({alertList: copyAlert});
     })
   }
 
@@ -70,7 +74,7 @@ export class UserOpt extends React.Component {
         
         for(let iter = 0; iter < length; ++iter){
           console.log(data[iter].userId);
-          if(data[iter].userId !== this.state.ptcp && data[iter].status === 0){
+          if(data[iter].userId !== this.state.ptcp && data[iter].status === 0 || data[iter].status ===3){
             _copyAlert.push(data[iter]);
           }
           else{
@@ -94,9 +98,11 @@ export class UserOpt extends React.Component {
 
     if(_searchItems.ideaToken == null){
       this.setState({showModal: true});
+      console.log(1000);
     }
     else{
       this.setState({showModal2: true});
+      console.log(2000);
     }
     
   }
@@ -135,12 +141,12 @@ export class UserOpt extends React.Component {
             content = {this.state.cont}
             onClick={()=>{this.modalClose()}}
           />
-        <p>알림 {this.state.alertList.length}건.</p>
+        <p>요청 {this.state.alertList.length}건.</p>
         {this.state.alertList.map(searchItems => (
           <ListItemsCompnt
-            key={searchItems.id}
+            key={searchItems}
             title = {this.state.holdTitle[searchItems.id]}
-            description = {'click to confirm'}
+            description = {'click to check'}
             onClick={() => this.handleClick(searchItems)}
           />
         ))}
