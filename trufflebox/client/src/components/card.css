@@ -1,15 +1,63 @@
 .ToDoListItem {
-    border: 1px solid aquamarine;
+    align-self: stretch;
     margin: 12px;
     border-radius: 4px;
-    width: 300px;
-    background-color: #fafbfd;
-    box-shadow: 1px 2px 5px 3px rgba(0,0,0,.1);
+    width: flex;
+    background-color: #282c34;
     padding: 4px 2px;
     color:#333;
   }
   
   .ToDoListItem-title {
+    font-size: 19px;
+    margin: 0 8px 4px;
+    border-bottom: 1px solid rgb(59, 59, 59);
+    text-align: left;
+    padding: 4px 8px;
+    color:#8ab4f8;
+  }
+  
+  .ToDoListItem-description {
+    font-size: 16px;
+    word-wrap: break-word;
+    text-align: left;
+    padding: 8px;
+    color:#cecece;
+  }
+
+  .AlertListItem {
+    display: flex;
+    border-radius: 30px;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    padding: 1em 2em;
+    width: 300px;
+    color: #333;
+    font-size: 18px;
+    font-weight: 700;
+    background-color: #cccccc;
+    transition: 0.3s;
+  }
+  .AlertListItem::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background-color: #2285b1;
+    border-radius: 50vh;
+    transition: 0.3s;
+  }
+  
+  .AlertListItem:hover {
+    text-decoration: none;
+    background-color: #bbbbbb;
+  }
+  
+  .AlertListItem:hover::after {
+    transform: scale(2);
+  }
+  
+  .AlertListItem-title {
     font-size: 18px;
     margin: 0 8px 4px;
     border-bottom: 1px solid #333;
@@ -18,8 +66,9 @@
     color:#333;
   }
   
-  .ToDoListItem-description {
+  .AlertListItem-description {
     word-wrap: break-word;
+    font-size: initial;
     text-align: left;
     padding: 8px;
     color:#333;

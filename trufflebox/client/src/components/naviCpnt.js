@@ -36,12 +36,10 @@ export const Nav = ({contract, accounts}) => {
 
   return (
     <div>
-      <header>
-        navigation
-      </header>
+      <header></header>
       <Link to="/"><button>home</button></Link>
       {/* <Link to="/search"><button>search</button></Link> */}
-      <button onClick={(event)=>{openSearch(event)}}>search</button>
+      <button onClick={(event)=>{openSearch(event)}}>---</button>
       {isSearchOpen? <Serch onClick={(event)=>{closeSearch(event)}}/> :""}
       <Link to="/myinfo"><button>myPage</button></Link>
 

@@ -13,8 +13,6 @@ export class Modal extends React.Component {
     super(props);
     this.state = {
       editors: [],
-      points: [],
-      score: 0,
     };
   }
   
@@ -36,19 +34,19 @@ export class Modal extends React.Component {
     else{
       //console.log(props.content.origin);
       let ideaid = this.props.content.id;
-      await getIdeaPoints(ideaid).then((data) => {
-        let copyPoint = [...this.state.points];
-        let tempScore = 0;
-        //copyPoint.push(100);
-        for(let iter = 0; iter < data.length; ++iter){
-          console.log(data[iter]);
-          copyPoint.push(data[iter]);
-          this.setState({points: copyPoint});
-          tempScore += data[iter];
-        }
-        console.log(this.state.points);
-        this.setState({score: tempScore});
-      });
+      // await getIdeaPoints(ideaid).then((data) => {
+      //   let copyPoint = [...this.state.points];
+      //   let tempScore = 0;
+      //   //copyPoint.push(100);
+      //   for(let iter = 0; iter < data.length; ++iter){
+      //     console.log(data[iter]);
+      //     copyPoint.push(data[iter]);
+      //     this.setState({points: copyPoint});
+      //     tempScore += data[iter];
+      //   }
+      //   console.log(this.state.points);
+      //   this.setState({score: tempScore});
+      // });
       await getIdeaPlayers(ideaid).then((data) => {
         let copyEditors = [...this.state.editors];
         for(let iter = 0; iter < data.length; ++iter){
@@ -67,7 +65,6 @@ export class Modal extends React.Component {
 
   typeBranch = () => {
     if(this.props.content.type === 1){
-      console.log(this.state.editors);
       return(
         <Type_direct
           content={this.props.content}
@@ -88,9 +85,11 @@ export class Modal extends React.Component {
         />
       )
     }
-    else{
+    else if(this.props.content.type === 0){
+      console.log(this.state.editors);
       return(
         <Type_cycle
+          editors={this.state.editors}
           content={this.props.content}
           account={this.props.account}
           contract={this.props.contract}
@@ -108,21 +107,15 @@ export class Modal extends React.Component {
           <div id="modalcontents" className="modalcontents">
             <div>
               <p>{this.props.content.title}</p>
-              <ul><div style={{fontSize: "15px"}}>이 아이디어에 아래의 참가자가 참가중</div>
+              <p style={{fontSize: "20px", margin: 0}}>{this.props.content.description}</p>
+              {/* <ul><div style={{fontSize: "15px"}}>이 아이디어의 제안자/참여자</div>
                 {this.state.editors.map((editor, index) => (
                   <li key={index}>
                     {editor} :-: {((this.state.points[index]/this.state.score)*100).toFixed(2)}%
                   </li>
                 ))}
-              </ul>
+              </ul> */}
                 <this.typeBranch></this.typeBranch>
-                {/* <IdeaStatus
-                  content={this.props.content}
-                  onClick={this.props.onClick}
-                  ptcps={this.state.editors}
-                  contract={this.props.contract}
-                  account={this.props.account}
-                /> */}
             </div>
           </div>
         </div>
@@ -199,26 +192,36 @@ const docuLink = (_title) => {
   return ([allowcheck, downlink]);
 }
 
-class Type_direct extends React.Component{
+export class Type_direct extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
+      countDownDate: new Date("Jan 5, 2024 15:37:25").getTime(),
+      first: false,
       allowcheck: false,
       downlink: null,
-      editors: this.props.editors,
+      editors: null,
       content: this.props.content,
-      account: this.props.account,
-      contract: this.props.contract
+      account: this.props.account
     };
   }
-  componentDidUpdate = (prevProps) => {
-    if (this.props.editors !== prevProps.editors){
-      this.setState({editors: this.props.editors});
-    }
-    else{
-      console.log('there is no update');
-    }
+  componentDidMount = () => {
+    setTimeout(() => {
+      this.setState({ editors: this.props.editors})
+      if(this.state.editors.length - 1 === 0){
+        this.setState({first: true});
+      }
+    }, 200);
   }
+  // componentDidUpdate = (prevProps) => {
+  //   if (this.props.editors !== prevProps.editors){
+  //     this.setState({editors: this.props.editors});
+  //   }
+  //   else{
+  //     console.log(this.state.account);
+  //     console.log(this.state.editors);
+  //   }
+  // }
   
   docuDown = async() => {
     const fileCheck = await getIdeaOne(this.state.content.id);
@@ -229,27 +232,79 @@ class Type_direct extends React.Component{
       this.setState({downlink: result[1]});
     } 
     else
-      alert('not exist this document file');
-    //await getDcuDown(this.props.content.title);
+      alert('file does not exist');
   }
 
-  purchase = async() => {
-    getTeamAddr(
-      this.state.content.id,
-      //this.state.editors,
-      this.state.account,
-      this.state.contract
-    );
+  // purchase = async() => {
+  //   getTeamAddr(
+  //     this.state.content.id,
+  //     this.state.account,
+  //     this.state.contract
+  //   );
+  // }
+  tempclock = () => {
+    this.timer = setInterval(this.tick, 1000);
+  }
+  tick = () => {
+    this.setState(({ countDownDate }) => ({ countDownDate: countDownDate + 1000 }));
+    console.log(this.state.countDownDate);
+  };
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
+  leadPtct = () => {
+    let ownerCheck = false;
+    if(this.state.account === this.state.editors[0]){
+      ownerCheck = true;
+    }
+    return(
+      <>
+        <ul><div style={{fontSize: "15px"}}>제안자</div>
+          <li>{this.state.editors[0]}</li>
+        </ul>
+        <ul><div style={{fontSize: "15px"}}>경매 참여자</div>
+          {this.state.editors.map((editor, index) => (
+            <li key={index}>
+              {this.state.editors[index+1]}
+            </li>
+          ))}
+        </ul>
+        <p style={{margin: 0, fontSize: "15px"}}>경매 참여자 수: {this.state.editors.length - 1}</p>
+        <p style={{margin: 0}}>현재 호가 또는 시작가: {this.state.content.ideaToken} token</p>
+        {ownerCheck ? 
+        <button className="App-exeButton" onClick={this.tempButton}>경매종료</button>
+         : null}
+        <button onClick={this.tempclock}>temp</button>
+      </>
+    )
+  }
+  tempButton = () => {
+    const result = window.confirm('정말 해당 아이디어의 경매를 마치시겠습니까?\r\n(경매 종료 동시에 가장 높은 호가를 부른 참여자가 낙찰자로 선정됩니다)');
+    if(result){
+      alert('경매가 종료되었습니다');
+    }
+    else
+      alert('disapproval');
+  }
   render(){
     return(
       <>
+        {this.state.editors === null ? ( <></> ) : (
+          <this.leadPtct></this.leadPtct>
+        )}
+        
         <button onClick={this.props.onClick}>Close</button>
-        <button onClick={this.docuDown}>Download</button>
-        <button onClick={this.purchase}>purchase</button>
-        <p style={{margin: 0, fontSize: "15px"}}>status: sale</p>
-        <p style={{margin: 0}}>value: {this.state.content.ideaToken}</p>
+        <button onClick={this.docuDown}>in detail</button>
+        {/* <button onClick={this.purchase}>purchase</button> */}
+        <Link to={{
+            pathname: '/negoti',
+            search: `title=${this.state.content.title}&price=${this.state.content.ideaToken}&first=${this.state.first}`,
+            hash: `teamid=${this.state.content.id}`,
+            state: { test: 'this.state.editors[0]'}
+          }}>
+          <button>in Auction</button>
+        </Link>
         {this.state.allowcheck ? <a id="btn" 
         href={this.state.downlink}>download link</a>
          : null}
@@ -277,7 +332,9 @@ class Type_cycle extends React.Component{
     this.state = {
       inputTokn: null,
       inputStake: null,
-      inputPurchase: null,
+      editors: null,
+      points: [],
+      score: 0,
       showFlag: false,
       showPurchase: false,
       content: this.props.content,
@@ -286,8 +343,15 @@ class Type_cycle extends React.Component{
     };
   }
 
-  tempButton = () => {
-    tempButtonf(this.state.content, this.state.account);
+  componentDidUpdate = (prevProps) => {
+    if (this.props.editors !== prevProps.editors){
+      console.log(this.props.editors);
+      this.setState({editors: this.props.editors});
+      this.setPointAndScore();
+    }
+    else{
+      console.log('there is no update');
+    }
   }
   updateInput_A = (_evt) => {
     console.log(_evt.target.value,);
@@ -311,9 +375,43 @@ class Type_cycle extends React.Component{
     informFunding(record, this.state.account, this.state.contract);
   }
 
+  setPointAndScore = async() => {
+    console.log(this.state.editors);
+    let ideaid = this.props.content.id;
+    await getIdeaPoints(ideaid).then((data) => {
+      let copyPoint = [...this.state.points];
+      let tempScore = 0;
+      //copyPoint.push(100);
+      for(let iter = 0; iter < data.length; ++iter){
+        console.log(data[iter]);
+        copyPoint.push(data[iter]);
+        this.setState({points: copyPoint});
+        tempScore += data[iter];
+      }
+      console.log(this.state.points);
+      this.setState({score: tempScore});
+    });
+  }
+  leadPtct = () => {
+    return(
+      <>
+        <ul><div style={{fontSize: "15px"}}>이 아이디어의 제안자/참여자</div>
+          {this.state.editors.map((editor, index) => (
+            <li key={index}>
+              {editor} :-: {((this.state.points[index]/this.state.score)*100).toFixed(2)}%
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
   render(){
     return(
       <>
+        {this.state.editors === null ? ( <></> ) : (
+          <this.leadPtct></this.leadPtct>
+        )} 
         <button onClick={this.props.onClick}>Close</button>
         <button onClick={() => this.setState({showPurchase: true})}>Purchase</button>
         {this.state.showPurchase ? ( // showFlagがtrueだったらModalを表示する
@@ -375,157 +473,4 @@ class Type_fund extends React.Component{
 const tempButtonf = (_vara, _varb) => {
   console.log(_vara);
   console.log(_varb);
-}
-
-class IdeaStatus extends React.Component{
-  constructor(props) {
-    super(props);
-    this.state = {
-      itemList: [],
-      itemId: '',
-      value: null,
-      userInput: 100000,
-      showresult: false,
-      allowcheck: false,
-      downlink: 'http://giparang.asuscomm.com:3039/downloadfile/',
-      account: this.props.account,
-      contract: this.props.contract
-    };
-    //this.handleFormSubmit = this.handleFormSubmit.bind(this);
-  }
-
-  componentDidMount = async() => {
-    const price = this.props.content.ideaToken;
-    console.log('v :', price);
-    this.setState({value: price});
-  }
-
-  createRecord = async() => {
-    const record = {
-      useraddr: this.state.account,
-      token: this.state.value,
-      mode: 'min'
-    }
-    await putUpdateTokn(record);
-  }
-  
-  Purchase = async() => {
-    console.log(this.props.content.id);
-    console.log(this.state.account, this.props.ptcps);
-    
-    await this.state.contract.methods.purchase(
-      this.props.content.id,
-      this.state.account,
-      this.props.ptcps
-    ).send({ from: this.state.account });
-    this.createRecord();
-  }
-
-  ideaFunding = async() => {
-    this.setState({showresult: true});
-    
-    const userinfo = await getPlayersId(this.state.account);
-    
-    if(userinfo.token > this.state.userInput){
-      const record = {
-        useraddr: this.state.account,
-        token: this.state.userInput,
-        mode: 'min'
-      };
-      (async ()=> {
-        await putUpdateTokn(record);
-      })();
-      this.excuteFunding(this.state.userInput, userinfo.id);
-      console.log(this.props.content);
-    }
-    else{
-      console.log('not enougth');
-    }
-  }
-
-  excuteFunding = async(_stake, _userId) => {
-    //console.log('k ', _stake,'u ', _userId);
-    const record = {
-      name: this.props.content.title,
-      stake: _stake,
-      userid: _userId
-    };
-    await putFundIdea(record);
-  }
-
-  updateInput = (_evt) => {
-    console.log(_evt.target.value,)
-    this.setState({userInput: _evt.target.value,});
-  }
-
-  docuDown = async() => {
-    const result = window.confirm('You agree to keep this document confidential.\r\nYou can be legally responsible for unauthorized distribution.');
-    const link = this.state.downlink + this.props.content.title;
-    console.log(link);
-    if(result){
-      this.setState({allowcheck: true});
-      this.setState({downlink: link});
-    }
-    else
-      alert('disapproval');
-    
-    //await getDcuDown(this.props.content.title);
-  }
-
-  ideaStatus = () => {
-    const mode = this.props.content.type;
-    console.log(mode);
-    if(mode === 1){
-      return(<>
-        <button onClick={this.props.onClick}>Close</button>
-        <button onClick={this.docuDown}>Download</button>
-        <button onClick={this.Purchase}>Purchase</button>
-        <p style={{margin: 0, fontSize: "15px"}}>status: sale</p>
-        <p style={{margin: 0}}>value: {this.state.value}</p>
-      </>)
-    }
-    else if(mode === 2){
-      return(<>
-        <button onClick={this.props.onClick}>Close</button>
-        <button onClick={this.docuDown}>Download</button>
-        <button onClick={this.ideaFunding}>Fund</button>
-        { this.state.showresult ? <input name="amount" className="input" 
-        onChange={this.updateInput}/> : null }
-        <p style={{margin: 0, fontSize: "15px"}}>status: funding</p>
-        <p style={{margin: 0}}>goal: {this.state.value}</p>
-      </>)
-    }
-    else{
-      return(<>
-        <button onClick={this.props.onClick}>Close</button>
-        <button onClick={this.docuDown}>Download</button>
-        <Link to={{
-          pathname: '/joinup',
-          search: `title=${this.props.content.title}`,
-          hash: `origin=${this.props.content.origin}`,
-          state: {key: 'valuee'}
-        }}>
-        <button onClick={this.joinIdea}>Join</button>
-        </Link>
-        <button onClick={this.ideaFunding}>Fund</button>
-        { this.state.showresult ? <input name="amount" className="input" 
-        onChange={this.updateInput}/> : null }
-        <p style={{margin: 0, fontSize: "15px"}}>status: progress</p>
-      </>)
-    }
-  }
-  btn_d32 = async() => {
-    await dltTeam(1);
-  }
-  render(){
-    return(
-      <div>
-        <this.ideaStatus></this.ideaStatus>
-        {this.state.allowcheck ? <a id="btn" 
-        href={this.state.downlink}>download link</a>
-         : null}
-        {/* <button onClick={this.btn_d32}>btn_d32</button> */}
-      </div>
-    )
-  }
 }

@@ -2,7 +2,7 @@ import logo from '../logo.svg';
 import '../components/modal.css';
 import React from 'react';
 import { getOwnNft } from '../api.js';
-import ListItems from '../components/ItemsCpnt';
+import {ListItemsCompnt} from '../components/ItemsCpnt';
 import { NtModal } from '../components/ntModal';
 
 export class Mynft extends React.Component {
@@ -89,7 +89,7 @@ export class Mynft extends React.Component {
           <img src={logo} className="App-logo" alt="logo" />
           <p>보유 {this.state.itemList.length}건.</p>
           {this.state.itemList.map(searchItems => (
-            <ListItems
+            <ListItemsCompnt
               key={searchItems.title}
               title = {searchItems.title}
               description = {searchItems.description}

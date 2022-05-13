@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 import { getTeamAddr } from './cModalCpnt.js';
 import { 
   getPlayers, 
@@ -19,21 +20,6 @@ export class JoinModal extends React.Component {
       title: null,
     };
   }
-  
-  // componentDidUpdate = (prevProps) => {
-  //   console.log(this.props);
-  //   if (this.props.content !== prevProps.content && this.props.content.user_id !== undefined){
-  //     this.getTitle(this.props.content.team_id);
-  //   }
-  //   else{
-  //     console.log('there is no update');
-  //   }
-  // }
-  // getTitle = async(_teamId) => {
-  //   const team = await getIdeaOne(_teamId);
-  //   console.log(team.title);
-  //   this.setState({title: team.title});
-  // }
   
   modalDown = () => this.props.onClick();
 
@@ -78,7 +64,7 @@ export class JoinModal extends React.Component {
           onClick={this.props.onClick}
       />)
     }
-    else{
+    else if(mode === 4){
       return(
         <Type_purchaseXE
           content={this.props.content}
@@ -87,6 +73,16 @@ export class JoinModal extends React.Component {
           contract={this.props.contract}
           onClick={this.props.onClick}
       />)
+    }
+    else if(mode ===5){
+      return(
+        <Type_bid
+        content={this.props.content}
+        onClick={this.props.onClick}
+      />)
+    }
+    else{
+      console.log('mode err')
     }
   }
   
@@ -168,10 +164,7 @@ class Type_join extends React.Component{
     };
   }
   componentDidMount = async() => {
-    await getIdeaOne(this.props.content.team_id).then((data) => {
-      this.setState({title: data.title});
-      console.log(data);
-    })
+    this.setState({title: await getDocuTitle(this.state.content.team_id)});
   }
 
   joinIdea = async() => {
@@ -339,4 +332,46 @@ class Type_purchaseXE extends React.Component{
       </>
     )
   }
+}
+class Type_bid extends React.Component{
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: null,
+      content: this.props.content,
+    };
+  }
+  componentDidMount = async() => {
+    this.setState({title: await getDocuTitle(this.state.content.team_id)});
+  }
+  dltIdea = async() => {
+    await dltHold(this.state.content.id);
+  }
+  modalDown = () => this.props.onClick();
+
+  render(){
+    return(
+      <>
+        <p>・아래와 같이 낙찰되었습니다.</p>
+        <section style={{fontSize: "20px", lineHeight: "10px"}}>
+          <p>문서제목: {this.state.title}</p>
+          <p>입찰토큰: {this.state.content.tokn}</p>
+          <p>입찰자: uid-{this.state.content.user_id}</p>
+        </section>
+        <button onClick={() => {
+          //this.dltIdea();
+          this.modalDown();
+        }}>confirm</button>
+        <Link to={'/ideadetails/' + this.state.content.team_id} style={{ textDecoration: 'none' }}>
+        <button>해당 문서 이동</button></Link>
+        <button>상세 파일 열람</button>
+        <button>거래 확정</button>
+      </>
+    )
+  }
+}
+const getDocuTitle = async(_teamId) => {
+  const data = await getIdeaOne(_teamId);
+  //console.log(data.title);
+  return data.title;
 }

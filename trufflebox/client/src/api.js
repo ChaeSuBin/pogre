@@ -14,8 +14,11 @@ export async function getIdeaPoints(_teamId) {
 export async function getHold(_teamId) {
     return request(`/alert/${_teamId}`);
 }
-export async function getHoldEmit(_userId) {
-    return request(`/alertemit/${_userId}`);
+export async function getHoldBidPtcp(_userId) {
+    return request(`/alertbidptcp/${_userId}`);
+}
+export async function getHoldBid(_userId) {
+    return request(`/alertbid/${_userId}`);
 }
 export async function getTeamsCount() {
     return request(`/teamscount`);
@@ -59,6 +62,12 @@ export async function getPlayersId(_playerAddr) {
 }
 export async function getTeamPlayers(_teamId) {
     return request(`/teamplayers/${_teamId}`);
+}
+export async function getSearchIdea(_query) {
+    return request(`/teamsearch/${_query}`);
+}
+export async function getRemainTime(_teamId) {
+    return request(`/getremaintime/${_teamId}`);
 }
 export async function putUpdateBlock(record) {
     console.log('v', JSON.stringify(record));
@@ -107,9 +116,9 @@ export async function putUpdateIdea(record) {
       method: "PUT",
     });
 }
-export async function putViewIdea(record) {
+export async function putBidIdea(record) {
     console.log('v', JSON.stringify(record));
-    return request(`/viewidea`, {
+    return request(`/bididea`, {
       body: JSON.stringify(record),
       headers: {"Content-Type": "application/json"},
       method: "PUT",
@@ -147,6 +156,14 @@ export async function putNftLimit(record) {
 //       method: "POST",
 //     });
 // }
+export async function postHold(record) {
+    console.log('v', JSON.stringify(record));
+    return request(`/requirenego`, {
+      body: JSON.stringify(record),
+      headers: {"Content-Type": "application/json"},
+      method: "POST",
+    });
+}
 export async function postHoldIdea(record) {
     console.log('v', JSON.stringify(record));
     return request(`/requirejoin`, {

@@ -18,17 +18,12 @@ class ExitCall extends React.Component {
   
   componentDidUpdate = (prevProps) => {
     if (this.props.content !== prevProps.content){
-      //console.log(this.props.content);
       this.getPlayer();
     }
     else{
       console.log('there is no update');
     }
-    //this.getPlayer();
-  }
-  // componentDidMount = () => {
-  //   this.getPlayer();
-  // }
+  };
   
   getPlayer = async() => {
     if(this.props.content === null){

@@ -30,6 +30,23 @@
   color: #09d3ac;
 }
 
+.App-textBoder{
+  background-color: #282c34;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 1em 2em;
+  height: 100px;
+  width: 300px;
+  flex-direction: column;
+  text-align: left;
+  font-size: 26px;
+  font-weight: 100;
+  color: white;
+  border: 3px solid #FFA500;
+  border-radius: 10px;
+}
+
 .App-exeButton{
   background-color: #ec3f3f;
   color: whitesmoke;
@@ -37,4 +54,85 @@
 .App-exeButton2{
   background-color: #679c21;
   color: whitesmoke;
+}
+.hori {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.button04 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 50 auto;
+  padding: 1em 2em;
+  height: 100px;
+  width: 300px;
+  background-color: #282c34;
+  color: #39c5bb;
+  font-size: 21px;
+  font-weight: 500;
+  border: 3px solid #ff45a2dc;
+  border-radius: 10px;
+}
+
+.button04::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-top: 3px solid #39c5bb;
+  border-right: 3px solid #39c5bb;
+  transform: rotate(45deg);
+}
+
+.button04:hover {
+  color: #52ff9a;
+  text-decoration: none;
+  background-color: #282c34;
+}
+
+.button04:hover::after {
+  border-top: 3px solid #52ff9a;
+  border-right: 3px solid #52ff9a;
+}
+
+.search_bar{
+  display: flex; /*アイコン、テキストボックスを調整する*/
+  align-items: center; /*アイコン、テキストボックスを縦方向の中心に*/
+  justify-content: center; /*アイコン、テキストボックスを横方向の中心に*/
+  height: 50px;
+  width: 68%;
+  background-color: #ddd;
+}
+
+.search_icon{ /*アイコンに一定のスペースを設ける*/
+  height: 15px;
+  width: 15px;
+  padding: 5px 5px;
+}
+
+#text2{
+  font-size: 20px;
+  width: 80%; /*flexの中で100%広げる*/
+  background-color: #ddd;
+  border: none; /*枠線非表示*/
+  outline: none; /*フォーカス時の枠線非表示*/
+  box-sizing: border-box; /*横幅の解釈をpadding, borderまでとする*/
+}
+.textprerap {
+  white-space: pre-wrap;
+  text-align: left;
+  font-size: 18px;
+  margin-left: 20px;
+  color: #dcdcdc;
+}
+.underText{
+  text-decoration: underline;
+  font-size: 20px;
+  text-align: left;
+}
+.button02{
+  width: 220px;
+  background-color: #679c21;
+  color: snow;
 }

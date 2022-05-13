@@ -4,9 +4,10 @@ import { sequelize } from "./models.js";
 import filestream from "fs";
 import sharp from "sharp";
 import cors from "cors";
-import { Teams, Players, TeamPlayers, 
-  Holds, Piece, PlayersPiece } from "./models.js";
-import { info } from "console";
+import { 
+  Teams, Players, TeamPlayers, 
+  Holds, Piece, PlayersPiece 
+} from "./models.js";
 
 const app = express();
 app.use(cors());
@@ -19,9 +20,17 @@ app.listen(port, () => {
     console.log(`Listening at http://localhost:${port}`);
 });
 
+let bidsTimes = [];
+
 app.get("/", function (req, res) {
     res.send("(╯°ㅁ°)╯︵┻━┻");
 });
+app.get("/getremaintime/:teamid", async(req, res) => {
+  if(bidsTimes[req.params.teamid] == undefined)
+    res.json('not set');
+  else
+    res.json(bidsTimes[req.params.teamid]);
+})
 app.get("/ideaPoint/:teamid", async(req, res) => {
   const result = await TeamPlayers.findAll({
     where: { teamId: req.params.teamid },
@@ -47,18 +56,52 @@ app.get("/alert/:teamid", async(req, res) => {
     res.json(hold);
   }
 });
-app.get("/alertemit/:userid", async(req, res) => {
-  console.log(30000, req.params.userid)
-  const [hold, meta] = await sequelize.query(`select id, reqstake, description, status, user_id, team_id, tokn from holds where user_id=${req.params.userid} and status=1 or status=2 or status=4`);
-  console.log(hold);
-  console.log(meta.rowCount);
-  if(meta.rowCount == 0){
-    res.json('not found');
+const getOwner = async(_teamId) => {
+  const result = await TeamPlayers.findOne({
+    where: {teamId: _teamId }
+  });
+  return result.playerId;
+}
+app.get('/alertbidptcp/:userid', async(req, res) => {
+  let result = [];
+  
+  const[alerts, temp] = await sequelize.query(`select id, team_id, user_id, tokn, status from holds where status=5`);
+  for(let iter = 0; iter < temp.rowCount; ++iter){
+    console.log(1, alerts[iter]);
+    if(req.params.userid == alerts[iter].user_id){
+      result.push(alerts[iter]);
+    }
   }
-  else{
-    res.json(hold);
+  res.json(result);
+})
+app.get("/alertbid/:userid", async(req, res) => {
+  let result = [];
+  
+  const[teamId, temp] = await sequelize.query(`select id, team_id, user_id, tokn, status from holds where status=5`);
+  //console.log(temp.rowCount);
+  
+  for(let iter = 0; iter < temp.rowCount; ++iter){
+    let teamOwner = await getOwner(teamId[iter].team_id);
+    console.log(0, teamOwner);
+    console.log(1, teamId[iter]);
+    if(req.params.userid == teamOwner){
+      result.push(teamId[iter]);
+    }
   }
+  res.json(result);
 });
+// app.get("/alertbidshutdown/:userid", async(req, res) => {
+//   console.log(30000, req.params.userid);
+//   const [hold, meta] = await sequelize.query(`select id, reqstake, description, status, user_id, team_id, tokn from holds where user_id=${req.params.userid} and status=1 or status=2 or status=4`);
+//   console.log(hold);
+//   console.log(meta.rowCount);
+//   if(meta.rowCount == 0){
+//     res.json('not found');
+//   }
+//   else{
+//     res.json(hold);
+//   }
+// });
 app.get("/teamplayers/:teamid", async(req, res) => {
   let addr = [];
   const counter = await TeamPlayers.count({
@@ -105,18 +148,38 @@ app.get("/getmynft/:title", async(req, res) => {
     res.json(data);
   });
 })
-app.get("/teamsview/:nftmode", async (req, res) => {
-  const nftmode = req.params.nftmode;
-
+const checkBlockedIdea = (_ideas) => {
+  let result = [];
+  for(let iter = 0; iter < _ideas.count; ++iter){
+    if(!_ideas.rows[iter].blocked){
+      result.push(_ideas.rows[iter]);
+    }
+  }
+  return result
+}
+app.get("/teamsearch/:querystr", async (req, res) => {
   const limit = +req.query.limit || 5;
   const offset = +req.query.offset || 0;
-  if(nftmode === 'idea'){
+  const[result, temp] = await sequelize.query(`select id, title, description, idea_token from teams where blocked=false and type=1 and title like '%${req.params.querystr}%'`);
+  console.log(13300, result);
+  res.json(result);
+})
+app.get("/teamsview/:nftmode", async (req, res) => {
+  const nftmode = req.params.nftmode;
+  const mode = parseInt(nftmode, 10);
+  const limit = +req.query.limit || 10;
+  const offset = +req.query.offset || 0;
+  
+  if(mode === 1 || mode === 0){
+    console.log(10020, mode);
     const ideas = await Teams.findAndCountAll({
+      where: { type: mode},
       order: [[sequelize.literal("id"), "DESC"]],
       limit,
       offset,
     });
-    res.json(ideas.rows);
+    const result = checkBlockedIdea(ideas);
+    res.json(result);
   }
   else{
     const ideas = await Piece.findAndCountAll({
@@ -208,7 +271,7 @@ app.get("/downloadfile/:filename", async(req, res) => {
     res.set({
       'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'Content-Disposition': `attachment; filename=${fileName}.docx`});
+      'Content-Disposition': `attachment; filename=${fileName}`});
     res.status(200).send(data);
   })
 });
@@ -265,13 +328,65 @@ app.put("/tokenudt", async(req, res) => {
     await player.save();
   }
 });
-app.put("/viewidea", async(req, res) => {
+const setDsplayAndGetWinner = async(_teamId) => {
+  sequelize.query(`update teams set blocked=true where id=${_teamId}`);
+  
+  const winner = await sequelize.query(`select * from team_plays where "team_plays"."teamId"=${_teamId} and status != 100 order by status desc`);
+  console.log(winner[0][0].playerId);
+
+  const rows = await Holds.max('id') + 1;
+  await Holds.findOrCreate({
+    where: {id: rows },
+    defaults: {
+      teamId: winner[0][0].teamId,
+      tokn: winner[0][0].status,
+      userId: winner[0][0].playerId,
+      status: 5
+    }
+  }).then(([hold, created]) => {
+    if(created){
+      console.log(18800);
+    }
+  });
+}
+const calcExpired = async(_teamId) => {
+  bidsTimes[_teamId] = 100000;
+  // const winner = await sequelize.query(`select * from team_plays where "team_plays"."teamId"=13 and status != 100 order by status desc`);
+  // console.log(winner[0][0].status);
+
+  // setTimeout(() => {
+  //   const [winner, countRow] = sequelize.query(`select * from team_plays where "team_plays"."teamId"=${_teamId} and status != 100 order by status desc`);
+  //   console.log(winner[0]);
+  // }, doneTime);
+  
+  const timer = setInterval(() => {
+    bidsTimes[_teamId] -= 1000;
+    if(bidsTimes[_teamId] < 0){
+      console.log(9999);
+      clearInterval(timer);
+      setDsplayAndGetWinner(_teamId);
+    }
+  }, 1000);
+}
+app.put("/bididea", async(req, res) => {
+  const putToken = req.body.bidtoken;
   const team = await Teams.findOne({
-    where: { title: req.body.name },
+    where: { id: req.body.teamid },
   });
   if(team != null){
-    team.ideaToken += 1;
+    team.ideaToken = putToken;
     await team.save();
+  }
+  const player = await Players.findOne({
+    where: { id: req.body.userid }
+  });
+  
+  const result = await player.addTeams(team, { through: { status: putToken }});
+  console.log(12001, result);
+  console.log(79000, req.body.first);
+  if(req.body.first){
+    // setTimeout(calcExpired, 20000, req.body.teamid);
+    calcExpired(req.body.teamid);
   }
 })
 app.put("/fundidea", async(req, res) => {
@@ -335,17 +450,7 @@ app.put("/joinidea", async(req, res) => {
   //     save
   //   })
   await player.addTeams(team, { through: { status: req.body.stake }});
-});
-// app.post("/uploadfile", async(req, res) => {
-//   const idxContents = `{"title":"${req.body.name}","description":"${req.body.desc}"}`;
-//   filestream.writeFile(
-//     `idxFileSys/${req.body.name}.json`, idxContents, (err) => {
-//     if (err) { 
-//       throw err;
-//     }
-//     console.log('jsonが作成されました');
-//   })
-// });
+})
 const uploadfile = async(_req) => {
   const idxContents = `{"title":"${_req.body.name}","description":"${_req.body.desc}"}`;
   filestream.writeFile(
@@ -355,19 +460,7 @@ const uploadfile = async(_req) => {
     }
     console.log('jsonが作成されました');
   })
-}
-// app.post("/uploadocu", async(req, res) => {
-//   const data = Buffer.from(req.body.fbolb);
-//   console.log(data);
-//   console.log('t :', typeof data);
-//   filestream.writeFile(
-//     `dcuFileSys/${req.body.name}.docx`, data, (err) => {
-//     if (err) { 
-//       throw err;
-//     }
-//     console.log('wordが作成されました');
-//   })
-// });
+};
 const uploadocu = async(_req, nftmode) => {
   const data = Buffer.from(_req.body.fbolb);
   console.log(data);
@@ -399,6 +492,25 @@ const uploadocu = async(_req, nftmode) => {
     })
   }
 }
+app.post("/requirenego", async(req, res) => {
+  const rows = await Holds.max('id') + 1;
+  console.log(rows);
+  const record = {
+    teamId: req.body.teamid,
+    tokn : req.body.bidtoken,
+    userId : req.body.userid,
+    status: req.body.status
+  }
+  console.log(record);
+  await Holds.findOrCreate({
+    where: { id: rows },
+    defaults: record
+  }).then(([hold, created]) => {
+    if(created){
+      console.log(10002);
+    }
+  });
+});
 app.post("/requirejoin", async(req, res) => {
   let status = 0;
   const rows = await Holds.count() + 1;
@@ -460,7 +572,7 @@ app.post("/nftcreate", async(req, res) => {
   });
 });
 app.post("/ideacreate", async(req, res) => {
-  console.log(40000, req.body.price);
+  console.log(40000, req.body);
   
   const [team, created] = await Teams.findOrCreate({
     where: { title: req.body.name },

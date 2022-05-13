@@ -10,6 +10,8 @@ import {
   useParams
 } from "react-router-dom";
 import { ViewItems } from "./pages/ideaView";
+// import { IdeaDetails } from "./pages/ideaPage";
+import IdeaDetails from "./pages/ideaPage";
 import { Home } from "./pages/rootPage"
 import { Nav } from "./components/naviCpnt";
 import { AdminOpt } from "./pages/adminPage";
@@ -19,12 +21,15 @@ import { JoinIead } from "./pages/IdeaJoin";
 import { Nftwave } from "./pages/nftUpage";
 import { Mynft } from "./pages/nftCollection";
 import { Faucet } from "./pages/faucet";
+import { DanteUpage } from "./pages/postUpage";
 import "./App.css";
 
 class App extends Component {
   state = { 
     storageEth: 0, 
     storageTokn20: 0,
+    linkparam: null,
+    linkparamfromRoot: null,
     web3: null, 
     accounts: null, 
     contract_idea: null,
@@ -72,7 +77,6 @@ class App extends Component {
       console.error(error);
     }
   };
-
   runExample = async () => {
     const { accounts, contract_idea, contract_nft } = this.state;
 
@@ -95,6 +99,15 @@ class App extends Component {
     //console.log(this.state.storageEth);
   };
 
+  linkbackFromView = (_linkParam) => {
+    this.setState({linkparam: _linkParam});
+    console.log(_linkParam);
+  }
+  linkbackFromRoot = (_linkParam) => {
+    this.setState({linkparamfromRoot: _linkParam});
+    console.log(_linkParam);
+  }
+
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
@@ -115,11 +128,15 @@ class App extends Component {
                 <Routes>
                   <Route exact path='/' element={<Home 
                     accounts={this.state.accounts} contract={this.state.contract_brdg}
-                    storedEth={this.state.storageEth}/> }/>
+                    storedEth={this.state.storageEth} wired={(params) => this.linkbackFromRoot(params)}/> }/>
                   <Route exact path='/faucet' element={<Faucet 
                     account={this.state.accounts[0]} contract={this.state.contract_idea}
-                    storedEth={this.state.storageEth}/> }/>
-                  <Route exact path='/search/:mode' element={<Wrapper/>}/>
+                    storedEth={this.state.storageEth}/>}/>
+                  <Route exact path='/ideadetails/:teamid' element={<IdeaDetails
+                    account={this.state.accounts[0]}/>}/>
+                  <Route exact path='/search/:mode' element={<ViewItems
+                    accounts={this.state.accounts} contract={this.state.contract_idea}
+                    mode={this.state.linkparamfromRoot} wired={(params) => this.linkbackFromView(params)}/>}/>
                   <Route exact path='/create' element={<UploadIead 
                     accounts={this.state.accounts} contract={this.state.contract_idea}/>}/>
                   <Route exact path='/joinup' element={<JoinIead 
@@ -132,6 +149,8 @@ class App extends Component {
                     accounts={this.state.accounts} contract={this.state.contract_nft}/>}/>
                   <Route exact path='/ntcollect' element={<Mynft
                     accounts={this.state.accounts} contract={this.state.contract_nft}/>}/>
+                  <Route exact path='/danteup' element={<DanteUpage
+                    accounts={this.state.accounts[0]}/>}/>
                 </Routes>
               </div>
             </section>

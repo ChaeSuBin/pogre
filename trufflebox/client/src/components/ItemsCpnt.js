@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import { Link } from "react-router-dom";
 import { getImgBlob } from '../api';
 import './card.css';
 
-class ListItemsCompnt extends Component {
+export class ListItemsCompnt extends Component {
   state = {
     imagePreviewUrl: null
   }
@@ -35,18 +36,38 @@ class ListItemsCompnt extends Component {
   render() {
     const {
       title,
+      teamid,
       description,
       ...props
     } = this.props;
 
     return (
       <div className="ToDoListItem"{...props}>
-        <div className="ToDoListItem-title">{title}</div>
-        <div><img src={this.state.imagePreviewUrl} /></div>
+        
+        <Link to={'/ideadetails/' + teamid} style={{ textDecoration: 'none' }}>
+        <div className="ToDoListItem-title">{title}</div></Link>
+        { this.state.imagePreviewUrl===null ? <></>
+            : <div><img src={this.state.imagePreviewUrl} /></div>
+        }
         <div className="ToDoListItem-description">{description}</div>
       </div>
     );
   }
-}
+};
+export class AlertCardCpnt extends Component {
 
-export default ListItemsCompnt;
+  render() {
+    const {
+      title,
+      description,
+      ...props
+    } = this.props;
+
+    return (
+      <div className="AlertListItem"{...props}>
+        <div className="AlertListItem-title">{title}</div>
+        <div className="AlertListItem-description">{description}</div>
+      </div>
+    );
+  }
+};
