@@ -104,6 +104,25 @@ export const Holds = sequelize.define("holds",
   { underscored: true },
 );
 
+export const Reply = sequelize.define(
+  "replys",
+  {
+    account: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    location: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    }
+  },
+  { underscored: true },
+)
+
 export const Piece = sequelize.define(
   "piece",
   {

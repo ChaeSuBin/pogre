@@ -123,8 +123,9 @@
   white-space: pre-wrap;
   text-align: left;
   font-size: 18px;
-  margin-left: 20px;
+  margin-right: 20px;
   color: #dcdcdc;
+  border-bottom: 1px solid rgb(59, 59, 59);
 }
 .underText{
   text-decoration: underline;

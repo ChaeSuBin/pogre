@@ -38,13 +38,14 @@ export class ListItemsCompnt extends Component {
       title,
       teamid,
       description,
+      type,
       ...props
     } = this.props;
 
     return (
       <div className="ToDoListItem"{...props}>
         
-        <Link to={'/ideadetails/' + teamid} style={{ textDecoration: 'none' }}>
+        <Link to={'/ideadetails/' + teamid + '/' + type} style={{ textDecoration: 'none' }}>
         <div className="ToDoListItem-title">{title}</div></Link>
         { this.state.imagePreviewUrl===null ? <></>
             : <div><img src={this.state.imagePreviewUrl} /></div>

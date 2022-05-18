@@ -90,7 +90,7 @@ export class UploadIead extends React.Component {
         아이디어 제목<br/>
         <input name="docuname" size='38' placeholder='제목의 중요성은 열번 말해도 지나치지 않습니다' defaultValue={this.state.title} onChange={this.onTitleChange}/><br/>
         간단설명<br/>
-        <textarea name="docudesc" rows='15' cols='42' placeholder="단순명쾌한 설명으로 사람들이 이 아이디어를 클릭하게 만들어주세요&#13;&#13;이 공간을 다 채우면 딱 300자가 됩니다. 물론 그 이상 쓰셔도 되지만 설명은 간단한게 최고지요.
+        <textarea name="docudesc" rows='15' cols='42' placeholder="단순명쾌한 설명으로 사람들이 이 아이디어를 클릭하게 만들어주세요&#13;&#13;
         " defaultValue={this.state.desc} onChange={this.onDescChange}/>
         <br/>
         스토리텔링 파일<br/>
@@ -103,7 +103,7 @@ export class UploadIead extends React.Component {
           <p style={{color: '#C6C6C6', fontSize: "16px", margin: 0}}>아이디어 낙찰자가 아이디어 인수를 결심할 수 있도록 아이디어에 대해 최대한 상세히 기술해주세요.</p>
           <input type='file' onChange={this.onFileInputChange}/>
           <br/><br/>
-          경매시작가(토큰갯수):<br/>
+          경매시작가(토큰갯수):
           <input name="price" type="text" placeholder='amount of RED(Token)'/>
         </> : <> 
           <br/><br/>목표토큰갯수:<br/>
@@ -139,16 +139,18 @@ export class UploadIead extends React.Component {
         <div className="App-header">
           <section className="App-display">
             {this.state.modeCheck ? <this.inputForm></this.inputForm> : <>
-            <p>아이디어를 업로드 방식을 정해주세요</p>
+            <p>아이디어 업로드 방식을 정해주세요</p>
             <br/>
             <label style={{cursor: 'pointer'}}><input type="radio" name="color1" value="dirc" onChange={this.checkRadio}/> idea to sale</label>
-            <p style={{color: '#C6C6C6', fontSize: "18px", margin: 0}}>아이디어를 경매형식으로 판매합니다 <br/> 
-            아이디어 문서는 100자 이내의 '간단설명'과 사람들의 이목을 끌 '스토리텔링파일'(준 상세파일) <br/>
-            그리고 아이디어의 실행/구현방법을 담은 '상세설명파일'로 이루어집니다. <br/>
-            이 중 '상세설명파일'은 경매 종료 후 낙찰자에게만 공개되며 열람사실이 블록체인상에 기록됩니다. <br/>
-            {/* 아이디어 제안자는 마이페이지 -{'>'} 내 아이디어 조회페이지에서 경매종료버튼을 클릭하여 경매를 끝낼 수 있습니다. <br/> 
-            낙찰자는 아이디어 제안자에게 상세설명파일 이외의 자세한 정보를 요구할 수 있습니다. <br/>  */}
-            경매는 첫 입찰자가 참여한 후부터 3일간 진행됩니다.</p><br/>
+            <ul style={{color: '#C6C6C6', fontSize: "18px", marginRight: '8em'}}><li>아이디어를 경매형식으로 판매합니다 </li>
+            <li>경매에 입찰하는 모든 사람을 참여자, 상세설명파일 열람자격과 아이디어를 인수할 권리를 얻은자를 낙찰자, 최종적으로 아이디어를 인수하여 거래를 완료시킨자를 인수자라 칭합니다.</li>
+            <li>경매 참여자중 가장 높은 금액을 제시한 참여자를 낙찰자로 선정합니다.</li>
+            <li>낙찰자가 반드시 인수자가 된다는 보장은 없습니다.</li>
+            <li>아이디어 문서는 100자 이내의 '간단설명'과 사람들의 경매 참여를 결심하게 할 '스토리텔링파일'(준 상세파일)
+            그리고 아이디어의 실행/구현방법을 담은 '상세설명파일'로 이루어집니다.</li>
+            <li>이 중 '상세설명파일'은 경매 종료 후 낙찰자에게만 공개되며 열람사실이 블록체인상에 기록됩니다.</li>
+            <li>낙찰자는 인수결심을 위한 '상세설명파일'에 기재된 정보 이외의 추가 정보를 요구할 수 있으며 이 경우 열람사실 기록을 위해 반드시 '쓰레드 웹'을 통해 낙찰자에게 추가적인 파일을 전달해야 합니다.</li>
+            <li>경매는 첫 입찰자가 참여한 후부터 3일간 진행됩니다.</li></ul><br/>
             {/* <label><input type="radio" name="color1" value="cycl" onChange={this.checkRadio}/> 다른 사람들과 협업하여 개선 후 팔기</label> */}
             <label style={{cursor: 'pointer'}}><input type="radio" name="color1" value="fund" onChange={this.checkRadio}/> idea to share</label>
             <p style={{color: '#C6C6C6', fontSize: "18px", margin: 0}}> 아이디어를 자유롭게 제안합니다<br/>

@@ -262,6 +262,13 @@ app.get("/viewimg/:pictitle", async(req, res) => {
     res.end(data) // Send the file data to the browser.
   })
 });
+app.get("/viewdocx/:docxtitle", async(req, res) => {
+  filestream.readFile(`dcuFileSys/${req.params.docxtitle}.docx`, function(err, data) {
+    if (err) throw err // Fail if the file can't be read.
+    res.writeHead(200, {'Content-Type': 'application/msword'})
+    res.end(data) // Send the file data to the browser.
+  })
+});
 app.get("/downloadfile/:filename", async(req, res) => {
   //res.download(`dcuFileSys/${req.params.filename}.docx`);
   filestream.readFile(

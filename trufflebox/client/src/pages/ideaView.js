@@ -11,6 +11,7 @@ export class ViewItems extends React.Component {
     super(props);
     this.state = {
       showModal: false,
+      allBtn: true,
       itemList: [],
       cont: null,
       nftmode: 0,
@@ -52,7 +53,6 @@ export class ViewItems extends React.Component {
   }
 
   selectBranch = () => {
-    const type = this.props.mode;
     return(<>
       <SearchBarCpnt
         account = {this.state.accounts[0]}
@@ -64,22 +64,28 @@ export class ViewItems extends React.Component {
   }
 
   getAllIdeas = async() => {
+    let type = this.props.mode;
+    if(type === null)
+      type = 1;
     this.setState({
-      itemList: await getIdeas(this.props.mode)
+      itemList: await getIdeas(type)
     });
+    this.setState({ allBtn: false})
   }
   searchButton = async(_searchString) => {
     //console.log(_searchString);
     this.setState({
       itemList:  await getSearchIdea(_searchString)
     });
+    this.setState({ allBtn: true})
   }
 
   clicktoSale = () => {
     return(
       <>
         <div>
-        <button onClick={this.getAllIdeas} style={{width: '200px', height: 'auto'}}>아이디어 전체보기</button>
+        { this.state.allBtn ? <><button onClick={this.getAllIdeas} style={{width: '200px', height: 'auto'}}>아이디어 전체보기</button></>:<></>}
+        
         <button onClick={this.showCategory} style={{width: '200px', height: 'auto'}}>아이디어 분류</button></div>
         { this.state.itemList.length ? <>
           <p style={{color: '#a5a5a5', textAlign: 'left', margin: 20, fontSize: "15px"}}>총 {this.state.itemList.length}건 <br/>
@@ -90,6 +96,7 @@ export class ViewItems extends React.Component {
               title = {searchItems.title}
               description = {searchItems.description}
               teamid = {searchItems.id}
+              type = {searchItems.type}
               ntmode = {this.state.nftmode}
               onClick={() => this.handleClick(searchItems)}
             />
@@ -127,7 +134,7 @@ class SearchBarCpnt extends React.Component{
   render(){
     return(
       <>
-        <p>최고의 아이디어 공유 플랫폼 /Threads</p>
+        {/* <p>최고의 아이디어 공유 플랫폼 /Threads</p> */}
         <div className="search_bar">
             <i className="fas fa-search search_icon"></i>
             <input id="text2" type="text" onChange={this.changeInput} placeholder="키워드 입력"></input>

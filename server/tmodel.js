@@ -1,7 +1,7 @@
-import { sequelize, Players, Teams, TeamPlayers, Piece, Holds } from "./models.js";
+import { sequelize, Players, Teams, TeamPlayers, Piece, Holds, Reply } from "./models.js";
 
-await sequelize.sync({ force: true }); //all table initilizing
-//await Holds.sync({force: true});
+//await sequelize.sync({ force: true }); //all table initilizing
+await Reply.sync({force: true});
 //await Holds.sync({alter: true});
 
 // (async()=>{

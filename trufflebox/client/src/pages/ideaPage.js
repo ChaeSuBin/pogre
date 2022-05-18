@@ -21,7 +21,7 @@ class IdeaDetails extends React.Component{
       clearTimeout(this.timer);
   }
   componentDidMount = () => {
-    //console.log(this.props.router);
+    console.log(this.props.router);
     this.getContents();
     
     setTimeout(() => {
@@ -78,6 +78,7 @@ class IdeaDetails extends React.Component{
   }
 
   leadPtct = () => {
+    const ideaType = parseInt(this.props.router.params.type, 10);
     let ownerCheck = false;
     if(this.state.account === this.state.editors[0]){
       ownerCheck = true;
@@ -87,37 +88,55 @@ class IdeaDetails extends React.Component{
         this.getRemain();
     }
     return(
-      <>
-        <ul><div style={{fontSize: "15px"}}>제안자</div>
-          <li>{this.state.editors[0]}</li>
+      <div className='textprerap'>
+        <ul>
+          <li>제목</li>
+          <p className='textprerap'>{this.state.contents.title}</p>
+          
+          <li style={{margin: 'inherit'}}>아이디어 설명</li><p className='textprerap'>{this.state.contents.description}</p>
+          <button onClick={this.docuDown} className="button02">이 아이디어의 더욱 자세한 정보 보기</button>
+          { ideaType ? <><li style={{margin: 'inherit'}}>아이디어 경매에 참여하기 전에.</li>
+          <p className='textprerap'>
+            1. 경매에 참여한 모든 사람을 참여자, 상세설명파일 열람자격과 아이디어를 인수할 권리를 얻은자를 인수권자, <br/>   최종적으로 아이디어를 인수하여 거래를 완료시킨자를 낙찰자라 칭합니다.<br/>
+            2. 아이디어 경매 종료 후 인수권자로 선정되면 아이디어 낙찰가만큼의 토큰을 에스크로에 이체시켜야 합니다.<br/>
+            3. 토큰의 에스크로 이체가 완료되면 인수권자는 아이디어의 핵심 내용(상세설명파일)의 열람 권한을 얻습니다.<br/>
+            4. 인수권자는 상세설명파일에 기재된 내용이 인수에 부족하다고 생각할 경우 추가정보를 요청하거나 거래를 포기할 수 있습니다.<br/>
+            5. 인수권자가 열람하는 모든 파일은 열람사실이 블록체인상에 기록됩니다.<br/>
+            6. 인수권자가 인수를 포기할 시 낙찰자에게 낙찰가액의 80%만 반환합니다.
+          </p>
+          <p style={{margin: 0}}>경매 참여자 수: {this.state.editors.length - 1}</p>
+          <p style={{margin: 0}}>현재 호가 또는 시작가: {this.state.contents.ideaToken} token</p>
+          <p style={{margin: 0}}> 남은 경매 시간: {this.state.remain}</p>
+          <button onClick={this.autionButon} className="button02">이 아이디어의 경매에 참여하기</button>
+          </>
+          :<><p>댓글 목록.</p>
+          <textarea name="docudesc" rows='3' cols='60' placeholder="댓글 입력" onChange={this.onReplChange}/>
+          <button onClick={this.upReButton}>reply</button>
+          </>}
+          
+          {/* <ul><div style={{fontSize: "15px"}}>경매 참여자</div>
+            {this.state.editors.map((editor, index) => (
+              <li key={index}>
+                {this.state.editors[index+1]}
+              </li>
+            ))}
+          </ul> */}
+          
         </ul>
-        <p className='textprerap'>-아이디어 설명 <br/>{this.state.contents.description}</p>
-        
-        <button onClick={this.docuDown} className="button02">이 아이디어의 더욱 자세한 정보 보기</button>
-        <p className='textprerap'>-아이디어 경매에 참여하기 전에.
-        <br/> 1. 아이디어 경매 종료 후 낙찰자로 선정되면 아이디어 낙찰가만큼의 토큰을 에스크로에 이체시켜야 합니다.
-        <br/> 2. 토큰의 에스크로 이체가 완료되면 낙찰자는 아이디어의 핵심 내용(상세설명파일)의 열람 권한이 주어집니다.
-        <br/>     이때 낙찰자의 상세설명파일 열람사실은 블록체인상에 기록됩니다.
-        {/* <br/> 5. 낙찰자가 인수를 포기할 시 해당 아이디어에 대한 권리를 주장할 수 없으며 애스크로는 낙찰가액의 80%만 반환합니다. */}
-        </p>
-        {/* <ul><div style={{fontSize: "15px"}}>경매 참여자</div>
-          {this.state.editors.map((editor, index) => (
-            <li key={index}>
-              {this.state.editors[index+1]}
-            </li>
-          ))}
-        </ul> */}
-        <p style={{margin: 0, fontSize: "15px"}}>경매 참여자 수: {this.state.editors.length - 1}</p>
-        <p style={{margin: 0}}>현재 호가 또는 시작가: {this.state.contents.ideaToken} token</p>
-        <p style={{margin: 0, fontSize: "17px"}}> 남은 경매 시간: {this.state.remain}</p>
-        {ownerCheck ? 
+        {/* {ownerCheck ? 
         <button className="App-exeButton" onClick={this.tempButton}>경매종료</button>
-         : null}
-      </>
+         : null} */}
+      </div>
     )
   }
+  upReButton = () => {
+    console.log('clicked');
+  }
+  onReplChange = (evt) => {
+    console.log(evt.target.value);
+  }
   autionButon = () => {
-      this.setState({showFlag: true});
+    this.setState({showFlag: true});
   }
   modalClose = () => {
     this.setState({showFlag: false});
@@ -130,10 +149,6 @@ class IdeaDetails extends React.Component{
         {this.state.slide ? <p>최고의 아이디어 공유 플랫폼 /Threads <br/>문서 로드 중...</p>
         :<>
           <this.leadPtct></this.leadPtct>
-          <div>
-            
-            <button onClick={this.autionButon} className="button02">이 아이디어의 경매에 참여하기</button>
-          </div>
           <AuctionInput 
             showFlag={this.state.showFlag} account={this.state.account} 
             cont={this.state.contents} ptcps={this.state.editors}

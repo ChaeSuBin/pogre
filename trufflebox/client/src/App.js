@@ -132,7 +132,7 @@ class App extends Component {
                   <Route exact path='/faucet' element={<Faucet 
                     account={this.state.accounts[0]} contract={this.state.contract_idea}
                     storedEth={this.state.storageEth}/>}/>
-                  <Route exact path='/ideadetails/:teamid' element={<IdeaDetails
+                  <Route exact path='/ideadetails/:teamid/:type' element={<IdeaDetails
                     account={this.state.accounts[0]}/>}/>
                   <Route exact path='/search/:mode' element={<ViewItems
                     accounts={this.state.accounts} contract={this.state.contract_idea}

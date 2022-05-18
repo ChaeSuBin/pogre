@@ -2,7 +2,6 @@
     align-self: stretch;
     margin: 12px;
     border-radius: 4px;
-    width: flex;
     background-color: #282c34;
     padding: 4px 2px;
     color:#333;
@@ -72,4 +71,20 @@
     text-align: left;
     padding: 8px;
     color:#333;
+  }
+
+  .wrapper-class {
+    padding: 1rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    border: 2px solid #ccc;
+    height: 400px;
+  }
+  .editor-class {
+    background-color:#f1f1f1;
+    padding: 1rem;
+    border: 2px solid #ccc;
+  }
+  .toolbar-class {
+    border: 2px solid #ccc;
   }
